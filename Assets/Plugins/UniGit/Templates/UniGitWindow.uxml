@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Plugins/UniGit/Templates/UniGitWindow.uss?fileID=7433441132597879392&amp;guid=b51ae25e2bc8c5049b717a2ef31425a4&amp;type=3#UniGitWindow" />
+    <ui:VisualElement name="header" style="flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; justify-content: space-between; overflow: hidden; flex-shrink: 0;">
+        <ui:VisualElement name="header-left" style="flex-direction: row-reverse;">
+            <ui:Label text="Master" display-tooltip-when-elided="true" name="label-branch" style="-unity-text-align: middle-left; width: 158px; margin-left: 5px;" />
+            <ui:VisualElement name="icon-git" style="height: 20px; width: 20px; background-image: url(&apos;project://database/Assets/Plugins/UniGit/Icons/icons8-git-16-2.png?fileID=21300000&amp;guid=6e2062233d518274997f5bfba5cdc614&amp;type=3#icons8-git-16-2&apos;); min-width: 19px; min-height: 19px; background-color: rgb(255, 255, 255); border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="header-right" style="flex-direction: row;">
+            <ui:DropdownField index="0" choices="Masterux,Testux" name="dropdown-branches" />
+            <ui:Button display-tooltip-when-elided="true" name="button-refresh" class="cursor-pointer" style="background-image: url(&apos;project://database/Assets/Plugins/UniGit/Icons/icons8-refresh-16.png?fileID=21300000&amp;guid=2d5fdac492ac9274db7fec1896f6c341&amp;type=3#icons8-refresh-16&apos;); width: 15px; height: 15px; background-color: rgba(88, 88, 88, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; -unity-text-align: middle-center;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="tabs" style="flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: nowrap; flex-grow: 0; flex-shrink: 0; flex-basis: auto;">
+        <ui:Button text="Changes" display-tooltip-when-elided="true" name="tab-changes" focusable="true" class="selected-tab" style="flex-grow: 1; padding-right: 0; margin-right: 0; padding-left: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-top: 0; margin-bottom: 0; border-right-width: 1px; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
+        <ui:Button text="Incomming" display-tooltip-when-elided="true" name="tab-incomming" tabindex="1" style="flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" />
+        <ui:Button text="Commits" display-tooltip-when-elided="true" name="tab-commits" tabindex="2" style="flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0;" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-shrink: 0;">
+        <ui:Label text="Message:" display-tooltip-when-elided="true" style="margin-left: 4px; margin-top: 5px; margin-bottom: 2px;" />
+        <ui:TextField picking-mode="Ignore" multiline="true" max-length="-1" name="textfield-commit" style="height: 78px;" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-direction: row; align-items: center;">
+        <ui:Label text="Check:" display-tooltip-when-elided="true" style="margin-top: 5px; margin-bottom: 5px; margin-left: 4px;" />
+        <ui:Button text="All" display-tooltip-when-elided="true" name="button-all" />
+        <ui:Button text="None" display-tooltip-when-elided="true" name="button-none" style="margin-left: 0;" />
+    </ui:VisualElement>
+    <ui:ListView focusable="true" name="files-status-container" show-border="false" show-foldout-header="false" show-alternating-row-backgrounds="ContentOnly" show-add-remove-footer="false" selection-type="Multiple" style="flex-grow: 1;" />
+    <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; flex-shrink: 0; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button text="Push commits (1)" display-tooltip-when-elided="true" name="button-push-staged" />
+            <ui:Button text="Commit selected" display-tooltip-when-elided="true" name="button-commit" />
+            <ui:Button text="Pull changes (5)" display-tooltip-when-elided="true" name="button-pull" tooltip="Pull 5 changes from origin/master" />
+            <ui:Button text="Fetch changes" display-tooltip-when-elided="true" name="button-fetch" tooltip="Pull 5 changes from origin/master" />
+        </ui:VisualElement>
+        <ui:Label text="1 files selected, 5 files in total" display-tooltip-when-elided="true" name="label-selected-count" />
+    </ui:VisualElement>
+</ui:UXML>

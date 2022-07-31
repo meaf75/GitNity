@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UXML xmlns="UnityEngine.UIElements">
+    <Box class="day-container">
+        <VisualElement class="header">
+            <Label name="label-day" text="1" />
+            <Button name="edit-btn" class="display-element no-display-element" text="Edit"/>
+        </VisualElement>
+        
+        <VisualElement class="hours-label-container">
+            <Label name="label-hours" text="1h"/>
+            
+            <VisualElement name="edit-day-container" class="no-display-element">
+                <Label text="Minutes:"/>
+                <TextField name="input-edit-minutes"/>
+            </VisualElement>
+        </VisualElement>
+    </Box>
+</UXML>

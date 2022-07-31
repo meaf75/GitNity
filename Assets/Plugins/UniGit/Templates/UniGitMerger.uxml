@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="flex-grow: 1;">
+        <ui:VisualElement name="scroll-container" style="flex-grow: 1; flex-direction: row;">
+            <ui:ListView focusable="true" horizontal-scrolling="true" style="flex-basis: 33%;" />
+            <ui:VisualElement style="flex-basis: 33%;" />
+            <ui:ListView focusable="true" horizontal-scrolling="true" style="flex-basis: 33%;" />
+        </ui:VisualElement>
+    </ui:ScrollView>
+</ui:UXML>

@@ -1,0 +1,13 @@
+.selected-tab {
+    background-color: rgb(195, 195, 195);
+    color: rgb(0, 0, 0);
+    -unity-font-style: bold;
+}
+
+.display-none {
+    display: none;
+}
+
+.cursor-pointer {
+    cursor: link;
+}
