@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,6 +18,7 @@ public static class FileStatusTemplate {
 	private static VisualTreeAsset template;
 	private static Dictionary<VisualElement, EventCallback<ChangeEvent<bool>>> registeredElements;
 	private static Dictionary<VisualElement, EventCallback<ClickEvent>> registeredResolveButtonCallbacks;
+	private static Dictionary<VisualElement, IManipulator> registeredRightClickManipulators;
 	
     /// <summary> Return elements from a FileStatusItem.uxml template </summary>
     private static void Cast(VisualElement _visualElement, out Elements elements) {
@@ -42,6 +41,9 @@ public static class FileStatusTemplate {
 	    
 	    if (registeredResolveButtonCallbacks == null)
 		    registeredResolveButtonCallbacks = new Dictionary<VisualElement, EventCallback<ClickEvent>>();
+	    
+	    if (registeredRightClickManipulators == null)
+		    registeredRightClickManipulators = new Dictionary<VisualElement, IManipulator>();
 	    
 	    // Get visual elements of FileStatusItem.uxml template	
 	    Cast(e, out var elements);
@@ -105,11 +107,19 @@ public static class FileStatusTemplate {
 	    // Add a single menu item
 	    void MenuBuilder(ContextualMenuPopulateEvent evtMenu) {
 		    evtMenu.menu.AppendAction("Show in explorer", uniGitWindow.ShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
-		    evtMenu.menu.AppendAction("Revert", uniGitWindow.RevertFile, _ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Ping file", uniGitWindow.PingFile,_ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("Revert", uniGitWindow.RevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), (a) => DropdownMenuAction.Status.Normal, idx);
 	    }
+
+	    if (registeredRightClickManipulators.ContainsKey(e)) {
+		    e.RemoveManipulator(registeredRightClickManipulators[e]);
+		    registeredRightClickManipulators.Remove(e);
+	    }
+
+	    var mb = new ContextualMenuManipulator(MenuBuilder);
 	    
-	    e.AddManipulator(new ContextualMenuManipulator(MenuBuilder));
+	    registeredRightClickManipulators.Add(e,mb);
+	    e.AddManipulator(mb);
     }
 }

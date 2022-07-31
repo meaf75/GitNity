@@ -11,3 +11,7 @@
 .cursor-pointer {
     cursor: link;
 }
+
+.full-height {
+    flex-grow: 1;
+}

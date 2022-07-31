@@ -56,9 +56,11 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 			UniGit.LoadData(this);
 		
 		VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
+		var TemplateContainer = uiAsset.Instantiate();
+		TemplateContainer.AddToClassList("full-height");
 		
 		rootVisualElement.Clear();
-		rootVisualElement.Add(uiAsset.CloneTree());
+		rootVisualElement.Add(TemplateContainer);
 		
 		UniGitWindowTemplate.RegisterElements(rootVisualElement);
 		
@@ -226,27 +228,38 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		var gitFileStatus = UniGit.filesStatus[idx];
 		EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
 	}
-    
-	public async void RevertFile(DropdownMenuAction aStatus) {
 
-		int selectedIdx = (int) aStatus.status;
-		
-		UniGitWindowTemplate.listViewContainer.SetSelection(selectedIdx);
+	public async void RevertFiles(DropdownMenuAction aStatus) {
 
-		Debug.Log("Revertux");
 		
-		await Task.Yield();
-		
-		if (aStatus.userData is GitFileStatus fileStatus) {
-			string msg = $"Are you sure you want to revert the following files: \n{fileStatus.path}";
-			bool delete = EditorUtility.DisplayDialog("Revert file", msg, "Yes", "No");
+		int selectedIdx = (int) aStatus.userData;
+		var selectedIndices = UniGitWindowTemplate.listViewContainer.selectedIndices.ToList();
 
-			if (delete) {
-				Debug.Log($"Deleting file {fileStatus.path}");
-			}
+		if (!selectedIndices.Contains(selectedIdx)) {
+			// Only focus non selected item
+			selectedIndices.Clear();
+			selectedIndices.Add(selectedIdx);
+			UniGitWindowTemplate.listViewContainer.SetSelection(selectedIndices);
+			await Task.Yield();
 		}
+
+		
+		var files = new GitFileStatus[selectedIndices.Count];
+
+		for (var i = 0; i < selectedIndices.Count; i++) {
+			files[i] = UniGit.filesStatus[selectedIndices[i]];
+		}
+
+		string msg = $"Are you sure you want to revert the following files: \n{string.Join("\n", files.Select(f => f.GetFullPath()))}";
+		bool revert = EditorUtility.DisplayDialog("Revert file", msg, "Yes", "No");
+
+		if (!revert) 
+			return;
+		
+		if(UniGit.RevertFiles(files))
+			DrawWindow(true);
 	}
-    
+
 	private static void ChangeValueFromMenu(object menuItem)
 	{
 		Debug.Log("selected: "+ (int) menuItem);
@@ -268,51 +281,33 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 	}
 
 	private void OnPressCommitSelected() {
-		var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected);
-		var filesPath = new string[filesSelected.Count];
+		var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected).ToArray();
+		var filesPath = new string[filesSelected.Length];
 		
-		for (int i = 0; i < filesSelected.Count; i++) {
+		for (int i = 0; i < filesSelected.Length; i++) {
 			filesPath[i] = $"\"{filesSelected[i].GetFullPath()}\"";
 		}
 		
 		// Stage files
-		Debug.Log($"git add -A -- {string.Join(" ",filesPath)}");
-		var gitAddExec = UniGit.ExecuteProcessTerminal2($"add -A -- {string.Join(" ",filesPath)}", "git");
+		bool added = UniGit.AddFilesToStage(filesSelected);
 		
-		if (gitAddExec.status != 0) {
-			Debug.LogWarning("Git add throw: " + gitAddExec.result);
-		} else {
-			Debug.Log($"<color=green>Files staged ({filesSelected.Count}), {gitAddExec.result}</color>");
-		}
+		if(!added)
+			return;
 		
 		// Commit
-		var gitCommitExec = UniGit.ExecuteProcessTerminal2($"commit -m \"{UniGitWindowTemplate.textFieldCommit.value}\"", "git");
+		var commited = UniGit.CommitStagedFiles(UniGitWindowTemplate.textFieldCommit.value);
 		
-		if (gitCommitExec.status != 0) {
-			Debug.LogWarning("Git commit throw: " + gitCommitExec.result);
-		} else {
-			Debug.Log($"<color=green>Commited changes</color>");
-		}
+		if(!commited)
+			return;
 		
 		DrawWindow(true);
 	}
 
 	private void PushCommits() {
-		// Check if current branch has upstream branch
-		var gitUpstreamBranchExec = UniGit.ExecuteProcessTerminal( "status -sb", "git");
-		var gitPushArg = gitUpstreamBranchExec.result.Split("\n")[0].Contains("...")	// If contains "..." means that current branch has upstream branch 
-			? "push" : 
-			$"push -u {UniGit.ORIGIN_NAME} {UniGit.currentBranch}";
-		
-		// Send changes
-		var gitPushExec = UniGit.ExecuteProcessTerminal(gitPushArg, "git");
-		
-		if (gitPushExec.status != 0) {
-			Debug.LogWarning("Push throw input: " + gitPushExec.result);
-		} else {
-			Debug.Log($"<color=green>Pushed changes ✔✔✔, {gitPushExec.result}</color>");
-			DrawWindow(true);
-		}
+		if(!UniGit.PushCommits())
+			return;
+
+		DrawWindow(true);
 	}
 	#endregion
 }

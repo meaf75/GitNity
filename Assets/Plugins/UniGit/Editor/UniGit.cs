@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
@@ -150,9 +151,12 @@ public static class UniGit {
     private static GitFileStatus GetFileStatus(string fileStatusWithPath) {
         
         GitFileStatus trackStatus;
-        trackStatus.path = fileStatusWithPath.Substring(3, fileStatusWithPath.Length - 3);
+        trackStatus.path = fileStatusWithPath[3..];
         trackStatus.isSelected = false;
         trackStatus.isMergeError = false;
+
+        if (trackStatus.path.Contains("\""))    // Clear spaced paths
+            trackStatus.path = trackStatus.path.Replace("\"","");
         
         trackStatus.trackedPathStatus = fileStatusWithPath[..2];
 
@@ -297,6 +301,65 @@ public static class UniGit {
 
         return (message.ToString(), process.ExitCode);
     }
+
+    #region Git actions
+    public static bool AddFilesToStage(GitFileStatus[] files) {
+        string[] paths = files.Select(f => $"\"{f.GetFullPath()}\"").ToArray();
+        var exec = ExecuteProcessTerminal2($"add -A -- {string.Join(" ",paths)}", "git");
+
+        if (exec.status == 0) {
+            Debug.Log($"<color=green>Files staged ({paths.Length}), {exec.result}</color>");
+            return true;
+        }
+        
+        Debug.LogWarning("Git add throw: "+exec.result);
+        return false;
+    }
+    
+    public static bool CommitStagedFiles(string message) {
+        var exec = ExecuteProcessTerminal2($"commit -m \"{message}\"", "git");
+
+        if (exec.status == 0) {
+            Debug.Log($"<color=green>Changes commited</color>");
+            return true;
+        }
+        
+        Debug.LogWarning("Git commit throw: "+exec.result);
+        return false;
+    }
+    
+    public static bool PushCommits() {
+        var gitUpstreamBranchExec = ExecuteProcessTerminal( "status -sb", "git");
+        var gitPushArg = gitUpstreamBranchExec.result.Split("\n")[0].Contains("...")	// If contains "..." means that current branch has upstream branch 
+            ? "push" : 
+            $"push -u {ORIGIN_NAME} {currentBranch}";
+        
+        // Send changes
+        var exec = ExecuteProcessTerminal(gitPushArg, "git");
+        
+        if (exec.status == 0) {
+            Debug.Log($"<color=green>Pushed changes ✔✔✔, {exec.result}</color>");
+            return true;
+        }
+        
+        Debug.LogWarning("Push throw: "+exec.result);
+        return false;
+    }
+
+    public static bool RevertFiles(GitFileStatus[] files) {
+        string[] paths = files.Select(f => $"\"{f.GetFullPath()}\"").ToArray();
+        var exec = ExecuteProcessTerminal2($"clean -f -q -- {string.Join(" ", paths)}", "git");
+
+        if (exec.status == 0) {
+            Debug.Log($"Files reverted:\n{string.Join("\n",paths)}");
+            return true;
+        }
+        
+        Debug.LogWarning("Revert files throw: "+exec.result);
+        return false;
+
+    }
+    #endregion
 
     public static string GetFullPath(this GitFileStatus gitFileStatus) {
         return Path.Combine(Application.dataPath.Replace("/Assets",""), gitFileStatus.path);
