@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="commit-message-container" style="flex-shrink: 0;">
+        <ui:Label text="Message:" display-tooltip-when-elided="true" style="margin-left: 4px; margin-top: 5px; margin-bottom: 2px;" />
+        <ui:TextField picking-mode="Ignore" multiline="true" max-length="-1" name="textfield-commit" style="height: 78px;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="file-checker-container" style="flex-direction: row; align-items: center;">
+        <ui:Label text="Check:" display-tooltip-when-elided="true" style="margin-top: 5px; margin-bottom: 5px; margin-left: 4px;" />
+        <ui:Button text="All" display-tooltip-when-elided="true" name="button-all" />
+        <ui:Button text="None" display-tooltip-when-elided="true" name="button-none" style="margin-left: 0;" />
+    </ui:VisualElement>
+    <ui:ListView focusable="true" name="files-status-container" show-border="false" show-foldout-header="false" show-alternating-row-backgrounds="ContentOnly" show-add-remove-footer="false" selection-type="Multiple" style="flex-grow: 1;" />
+    <ui:VisualElement name="bottom-buttons" style="flex-direction: row; justify-content: space-between; align-items: center; flex-shrink: 0; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button text="Push commits (1)" display-tooltip-when-elided="true" name="button-push-staged" />
+            <ui:Button text="Commit selected" display-tooltip-when-elided="true" name="button-commit" />
+            <ui:Button text="Pull changes (5)" display-tooltip-when-elided="true" name="button-pull" tooltip="Pull 5 changes from origin/master" />
+            <ui:Button text="Fetch changes" display-tooltip-when-elided="true" name="button-fetch" tooltip="Pull 5 changes from origin/master" />
+        </ui:VisualElement>
+        <ui:Label text="1 files selected, 5 files in total" display-tooltip-when-elided="true" name="label-selected-count" />
+    </ui:VisualElement>
+</ui:UXML>

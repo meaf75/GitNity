@@ -12,18 +12,17 @@ using Debug = UnityEngine.Debug;
 
 // Icons from https://icons8.com/
 public class UniGitWindow : EditorWindow, IHasCustomMenu {
-	private static class Classes {
+	public static class Classes {
 		public const string SelectedTabClass = "selected-tab";
 		public const string DisplayNoneClass = "display-none";
+		public const string FullHeightClass = "full-height";
 	}
 
 	// Icons: https://github.com/halak/unity-editor-icons
 
-	private const string DESIRED_PLUGIN_PATH = "Assets/Plugins/UniGit/Editor";
-
 	private static UniGitWindow window;
 
-	private bool isFocusedTextField;
+	
 	private int currentTab = 0;
 	
 	[MenuItem("Tools/UniGit/UniGit window")]
@@ -57,7 +56,7 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		
 		VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
 		var TemplateContainer = uiAsset.Instantiate();
-		TemplateContainer.AddToClassList("full-height");
+		TemplateContainer.AddToClassList(Classes.FullHeightClass);
 		
 		rootVisualElement.Clear();
 		rootVisualElement.Add(TemplateContainer);
@@ -69,98 +68,49 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 			tab.RegisterCallback<ClickEvent>(OnPressTab);
 		}
 		
+		// Header
 		UniGitWindowTemplate.labelBranch.text = UniGit.currentBranch;
-		UniGitWindowTemplate.buttonAll.RegisterCallback<ClickEvent>(_ => UpdateAll(true));
-		UniGitWindowTemplate.buttonNone.RegisterCallback<ClickEvent>(_ => UpdateAll(false));
-		UniGitWindowTemplate.buttonPull.RegisterCallback<ClickEvent>(_ => OnPressPull());
-		UniGitWindowTemplate.buttonFetch.RegisterCallback<ClickEvent>(_ => OnPressFetch());
-		UniGitWindowTemplate.buttonCommitSelected.RegisterCallback<ClickEvent>(_ => OnPressCommitSelected());
-		UniGitWindowTemplate.buttonPushCommits.RegisterCallback<ClickEvent>(_ => PushCommits());
-		UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => DrawWindow(true));
-
 		UniGit.currentBranchOptionIdx = UniGit.branches.IndexOf(UniGit.currentBranch);
 		UniGitWindowTemplate.dropdownBranches.index = UniGit.currentBranchOptionIdx;
 		UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
 		UniGitWindowTemplate.dropdownBranches.choices = UniGit.branches;
 		UniGitWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
-
-		UniGitWindowTemplate.textFieldCommit.RegisterCallback<FocusInEvent>(_ => isFocusedTextField = true);
-		UniGitWindowTemplate.textFieldCommit.RegisterCallback<FocusOutEvent>(_ => isFocusedTextField = false);
+		UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => DrawWindow(true));
 		
-		// Generate modified files
-		UniGitWindowTemplate.listViewContainer.fixedItemHeight = 21;
-		UniGitWindowTemplate.listViewContainer.makeItem = FileStatusTemplate.MakeItem;
-		UniGitWindowTemplate.listViewContainer.bindItem = (e, i) => {
-			FileStatusTemplate.BindItem(e, i, this);
-		};
-		UniGitWindowTemplate.listViewContainer.itemsSource = UniGit.filesStatus;
-		
-		rootVisualElement.RegisterCallback<KeyDownEvent>(UpdateSelections,TrickleDown.TrickleDown);
-
-		UpdateElementsBySelections();
-	}
-
-	private void UpdateAll(bool select) {
-		GitFileStatus fileStatus;
-
-		for (var i = 0; i < UniGit.filesStatus.Count; i++) {
-			fileStatus = UniGit.filesStatus[i];
-			fileStatus.isSelected = select;
-
-			UniGit.filesStatus[i] = fileStatus;
-		}
-		
-		UniGitWindowTemplate.listViewContainer.RefreshItems();
-		UpdateElementsBySelections();
-	}
-	
-	private void UpdateSelections(KeyDownEvent evt) {
-		// Skip if have not valid imputs v2
-		if(evt.keyCode != KeyCode.Space || isFocusedTextField)
-			return;
-		
-		var selectedIndices = UniGitWindowTemplate.listViewContainer.selectedIndices.ToArray();
-
-		if (selectedIndices.Count() > 1) {
-
-			bool selected;
-			// Number of items that has the checkbox active
-			int selectedCount = selectedIndices.Select(idx => UniGit.filesStatus[idx]).Count(item => item.isSelected);
-
-			if (selectedCount == selectedIndices.Length || selectedCount == 0) {
-				// Select / deselect all
-				selected = selectedCount != selectedIndices.Length;
-			} else {
-				// Select / deselect items based on majoriti
-				selected = selectedCount > selectedIndices.Length / 2;
-			}
-
-			// Update selected files based on first item selected
-			foreach (var idx in selectedIndices) {
-				var gitFileStatus = UniGit.filesStatus[idx];
-				gitFileStatus.isSelected = selected;
-
-				UniGit.filesStatus[idx] = gitFileStatus;
-			}
-		} else {
-			int idx = selectedIndices.ElementAt(0);
-			
-			// Change file state
-			var fileStatus = UniGit.filesStatus[idx];
-			fileStatus.isSelected = !fileStatus.isSelected;
-
-			UniGit.filesStatus[idx] = fileStatus;
-		}
-		
-		UniGitWindowTemplate.listViewContainer.RefreshItems();
+		LoadTab(0);
 	}
 	
 	private void OnPressTab(ClickEvent evt) {
-		// int (callback.currentTarget as Button)?.tabIndex
+		if (currentTab == ((Button) evt.currentTarget).tabIndex) {
+			return;
+		}
+		
 		UniGitWindowTemplate.tabs[currentTab].RemoveFromClassList(Classes.SelectedTabClass);
 
 		currentTab = ((Button) evt.currentTarget).tabIndex;
 		UniGitWindowTemplate.tabs[currentTab].AddToClassList(Classes.SelectedTabClass);
+
+		LoadTab(currentTab);
+	}
+
+	private void LoadTab(int tabIdx) {
+
+		if (tabIdx is 1 or 2) {
+			Debug.Log("not implemented");
+			return;
+		}
+
+		VisualElement TabContent;
+		UniGitWindowTemplate.tabContent.Clear();
+		
+		if (tabIdx == 0) {
+			TabContent = TabGitChangesTemplate.RenderTemplate(this,UniGitWindowTemplate.tabContent);
+		} else {
+			Debug.LogWarning("Unknown tab");
+			return;
+		}
+		
+		TabContent.AddToClassList(Classes.FullHeightClass);
 	}
 	
 	private void OnChangeDropdownOptionValue(ChangeEvent<string> evt) {
@@ -174,140 +124,5 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		UniGit.currentBranchOptionIdx = UniGitWindowTemplate.dropdownBranches.index;
 		Debug.Log("Selected: "+UniGitWindowTemplate.dropdownBranches.index);
 	}
-
-	private void UpdateElementsBySelections() {		
-		int selectedCount = UniGit.filesStatus.FindAll(f => f.isSelected).Count;
-		int totalCount = UniGit.filesStatus.Count;
-		
-		string filesSelectedTxt = selectedCount > 1 ? "files" : "file";
-		string filesTotalTxt = totalCount > 1 ? "files" : "file";
-		
-		UniGitWindowTemplate.labelSelectedCount.text = $"{selectedCount} {filesSelectedTxt} selected, {totalCount} {filesTotalTxt} in total";
-		UniGitWindowTemplate.buttonCommitSelected.SetEnabled(selectedCount > 0);
-
-		// Hide/Display button push
-		if (UniGitWindowTemplate.buttonPushCommits.ClassListContains(Classes.DisplayNoneClass)) {
-			UniGitWindowTemplate.buttonPushCommits.RemoveFromClassList(Classes.DisplayNoneClass);
-		}
-
-		if (UniGit.nonPushedCommits.Count == 0) {
-			UniGitWindowTemplate.buttonPushCommits.AddToClassList(Classes.DisplayNoneClass);
-		} else {
-			UniGitWindowTemplate.buttonPushCommits.text = $"Push commits ({UniGit.nonPushedCommits.Count})";
-			UniGitWindowTemplate.buttonPushCommits.tooltip = $"You have {UniGit.nonPushedCommits.Count} commits without push";
-		}
-	}
-
-	#region FileStatusTemplateCallbacks
-	public void OnClickFileToogle(int idx) {
-		var gitFileStatus = UniGit.filesStatus[idx];
-		gitFileStatus.isSelected = !gitFileStatus.isSelected;
-
-		UniGit.filesStatus[idx] = gitFileStatus;
-		
-		UniGitWindowTemplate.listViewContainer.RefreshItem(idx);
-		
-		UpdateElementsBySelections();
-	}
-
-	public void OnClickResolveMergeError(GitFileStatus gitFileStatus) {
-		EditorUtility.OpenWithDefaultApp(gitFileStatus.path);
-		EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
-	}
 	
-	public void ShowInExplorer(DropdownMenuAction aStatus) {
-		var idx = (int) aStatus.userData;
-		var fileStatus = UniGit.filesStatus[idx];
-		
-		Debug.Log("Opening file at path: "+fileStatus.GetFullPath());
-		EditorUtility.RevealInFinder(fileStatus.path);
-	}
-	
-	public void PingFile(DropdownMenuAction aStatus) {
-		var idx = (int) aStatus.userData;
-		var gitFileStatus = UniGit.filesStatus[idx];
-		EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
-	}
-
-	public async void RevertFiles(DropdownMenuAction aStatus) {
-
-		
-		int selectedIdx = (int) aStatus.userData;
-		var selectedIndices = UniGitWindowTemplate.listViewContainer.selectedIndices.ToList();
-
-		if (!selectedIndices.Contains(selectedIdx)) {
-			// Only focus non selected item
-			selectedIndices.Clear();
-			selectedIndices.Add(selectedIdx);
-			UniGitWindowTemplate.listViewContainer.SetSelection(selectedIndices);
-			await Task.Yield();
-		}
-
-		
-		var files = new GitFileStatus[selectedIndices.Count];
-
-		for (var i = 0; i < selectedIndices.Count; i++) {
-			files[i] = UniGit.filesStatus[selectedIndices[i]];
-		}
-
-		string msg = $"Are you sure you want to revert the following files: \n{string.Join("\n", files.Select(f => f.GetFullPath()))}";
-		bool revert = EditorUtility.DisplayDialog("Revert file", msg, "Yes", "No");
-
-		if (!revert) 
-			return;
-		
-		if(UniGit.RevertFiles(files))
-			DrawWindow(true);
-	}
-
-	private static void ChangeValueFromMenu(object menuItem)
-	{
-		Debug.Log("selected: "+ (int) menuItem);
-	}
-	#endregion
-	
-	#region Git operations
-	public void OnPressPull() {
-		Debug.Log("Pulling data");
-		
-		// Check if current branch has upstream branch
-		var output = UniGit.ExecuteProcessTerminal( $"pull {UniGit.ORIGIN_NAME} {UniGit.currentBranch} --allow-unrelated-histories", "git");
-		Debug.Log("Pull output: "+ output.result);
-	}
-	private void OnPressFetch() {
-		Debug.Log("Fetching all");
-		var output = UniGit.ExecuteProcessTerminal( "fetch --all", "git");
-		Debug.Log("Fetch output: "+ output.result);
-	}
-
-	private void OnPressCommitSelected() {
-		var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected).ToArray();
-		var filesPath = new string[filesSelected.Length];
-		
-		for (int i = 0; i < filesSelected.Length; i++) {
-			filesPath[i] = $"\"{filesSelected[i].GetFullPath()}\"";
-		}
-		
-		// Stage files
-		bool added = UniGit.AddFilesToStage(filesSelected);
-		
-		if(!added)
-			return;
-		
-		// Commit
-		var commited = UniGit.CommitStagedFiles(UniGitWindowTemplate.textFieldCommit.value);
-		
-		if(!commited)
-			return;
-		
-		DrawWindow(true);
-	}
-
-	private void PushCommits() {
-		if(!UniGit.PushCommits())
-			return;
-
-		DrawWindow(true);
-	}
-	#endregion
 }

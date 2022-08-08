@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +10,17 @@ public static class FileStatusTemplate {
 		public Label labelFileStatus;
 		public Toggle toggleFileStatus;	
 		public Button buttonResolveMerge;	
+	}
+	
+	public struct BindProperties {
+		public VisualElement Target;
+		public int Idx;
+		public GitFileStatus gitFileStatus;
+		public Action<ChangeEvent<bool>> OnClickToogleFile;
+		public Action<int> OnClickShowInExplorer;
+		public Action<DropdownMenuAction> OnClickPingFile;
+		public Action<DropdownMenuAction> OnClickRevertFiles;
+		public Action<int> OnClickResolveMergeError;
 	}
 
 	private static class StyleSheet {
@@ -35,7 +47,7 @@ public static class FileStatusTemplate {
 	    return element;
     }
 
-    public static void BindItem(VisualElement e, int idx, UniGitWindow uniGitWindow) {
+    public static void BindItem(BindProperties bindProperties) {
 	    if (registeredElements == null)
 		    registeredElements = new Dictionary<VisualElement, EventCallback<ChangeEvent<bool>>>();
 	    
@@ -46,51 +58,50 @@ public static class FileStatusTemplate {
 		    registeredRightClickManipulators = new Dictionary<VisualElement, IManipulator>();
 	    
 	    // Get visual elements of FileStatusItem.uxml template	
-	    Cast(e, out var elements);
+	    Cast(bindProperties.Target, out var elements);
 
-	    var fileStatus = UniGit.filesStatus[idx];
-	    var status = fileStatus.statusName.Split(";");
+	    var status = bindProperties.gitFileStatus.statusName.Split(";");
 	    
-	    HandleRightClick(e, idx, uniGitWindow);
+	    HandleRightClick(bindProperties);
 
 	    void Callback(ChangeEvent<bool> evt) {
-		    uniGitWindow.OnClickFileToogle(idx);
+		    bindProperties.OnClickToogleFile.Invoke(evt);
 	    }
 	    
 		// Remove callback from element
-	    if (registeredElements.ContainsKey(e)) {
-		    elements.toggleFileStatus.UnregisterValueChangedCallback(registeredElements[e]);
+	    if (registeredElements.ContainsKey(bindProperties.Target)) {
+		    elements.toggleFileStatus.UnregisterValueChangedCallback(registeredElements[bindProperties.Target]);
 	    }
 	    
-	    if (registeredResolveButtonCallbacks.ContainsKey(e)) {
-		    elements.buttonResolveMerge.UnregisterCallback(registeredElements[e]);
-		    registeredResolveButtonCallbacks.Remove(e);
+	    if (registeredResolveButtonCallbacks.ContainsKey(bindProperties.Target)) {
+		    elements.buttonResolveMerge.UnregisterCallback(registeredElements[bindProperties.Target]);
+		    registeredResolveButtonCallbacks.Remove(bindProperties.Target);
 	    }
 
 	    // Store reference of registered callbacks
-	    registeredElements[e] = Callback;
+	    registeredElements[bindProperties.Target] = Callback;
 	    elements.toggleFileStatus.RegisterValueChangedCallback(Callback);
-	    elements.toggleFileStatus.SetValueWithoutNotify(fileStatus.isSelected);
+	    elements.toggleFileStatus.SetValueWithoutNotify(bindProperties.gitFileStatus.isSelected);
 
-	    elements.labelFilePath.text = fileStatus.path;
+	    elements.labelFilePath.text = bindProperties.gitFileStatus.path;
 	    elements.labelFileStatus.text = status[0];
-	    elements.labelFileStatus.tooltip = status.Length > 1 ? status[1] : fileStatus.trackedPathStatus;
+	    elements.labelFileStatus.tooltip = status.Length > 1 ? status[1] : bindProperties.gitFileStatus.trackedPathStatus;
 
-	    var borderColor = new StyleColor(Color.Lerp(fileStatus.statusColor, Color.black, .7f));
+	    var borderColor = new StyleColor(Color.Lerp(bindProperties.gitFileStatus.statusColor, Color.black, .7f));
 			
-	    elements.labelFileStatus.style.backgroundColor = new StyleColor(fileStatus.statusColor);
+	    elements.labelFileStatus.style.backgroundColor = new StyleColor(bindProperties.gitFileStatus.statusColor);
 	    elements.labelFileStatus.style.borderBottomColor = borderColor;
 	    elements.labelFileStatus.style.borderRightColor = borderColor;
 
-	    if (fileStatus.isMergeError) {
+	    if (bindProperties.gitFileStatus.isMergeError) {
 
 		    void OnClickResolve(ClickEvent evt) {
-			    uniGitWindow.OnClickResolveMergeError(fileStatus);
+			    bindProperties.OnClickResolveMergeError.Invoke(bindProperties.Idx);
 		    };
 		    
 		    elements.buttonResolveMerge.RemoveFromClassList(StyleSheet.HIDE);
 			elements.buttonResolveMerge.RegisterCallback<ClickEvent>(OnClickResolve);
-			registeredResolveButtonCallbacks.Add(e, OnClickResolve);
+			registeredResolveButtonCallbacks.Add(bindProperties.Target, OnClickResolve);
 	    } else
 			elements.buttonResolveMerge.AddToClassList(StyleSheet.HIDE);
     }
@@ -103,23 +114,30 @@ public static class FileStatusTemplate {
     }
     
      
-    private static void HandleRightClick(VisualElement e, int idx, UniGitWindow uniGitWindow) {
+    private static void HandleRightClick(BindProperties bindProperties) {
+
+	    int idx = bindProperties.Idx;
+	    
+	    void OnClickShowInExplorer(DropdownMenuAction dropdownMenuAction) {
+		    bindProperties.OnClickShowInExplorer.Invoke(idx);
+	    }
+	    
 	    // Add a single menu item
 	    void MenuBuilder(ContextualMenuPopulateEvent evtMenu) {
-		    evtMenu.menu.AppendAction("Show in explorer", uniGitWindow.ShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
-		    evtMenu.menu.AppendAction("Ping file", uniGitWindow.PingFile,_ => DropdownMenuAction.Status.Normal, idx);
-		    evtMenu.menu.AppendAction("Revert", uniGitWindow.RevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("Show in explorer", OnClickShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("Ping file", bindProperties.OnClickPingFile,_ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("Revert", bindProperties.OnClickRevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), (a) => DropdownMenuAction.Status.Normal, idx);
 	    }
 
-	    if (registeredRightClickManipulators.ContainsKey(e)) {
-		    e.RemoveManipulator(registeredRightClickManipulators[e]);
-		    registeredRightClickManipulators.Remove(e);
+	    if (registeredRightClickManipulators.ContainsKey(bindProperties.Target)) {
+		    bindProperties.Target.RemoveManipulator(registeredRightClickManipulators[bindProperties.Target]);
+		    registeredRightClickManipulators.Remove(bindProperties.Target);
 	    }
 
 	    var mb = new ContextualMenuManipulator(MenuBuilder);
 	    
-	    registeredRightClickManipulators.Add(e,mb);
-	    e.AddManipulator(mb);
+	    registeredRightClickManipulators.Add(bindProperties.Target,mb);
+	    bindProperties.Target.AddManipulator(mb);
     }
 }

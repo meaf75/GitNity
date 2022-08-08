@@ -21,6 +21,12 @@ public struct GitFileStatus {
 }
 
 public static class UniGit {
+
+    public static class TabGitChanges {
+        public static void LoadData() {
+            
+        }
+    }
     
     public static string pluginPath;
     public static string currentBranch;
@@ -39,7 +45,7 @@ public static class UniGit {
     public static int currentBranchOptionIdx;
     public static int newBranchOptionIdx;
 
-    private static Dictionary<string, string> UnmergedStatus = new() {
+    private static readonly Dictionary<string, string> UnmergedStatus = new() {
         {"DD", "unmerged, both deleted"},
         {"AU", "unmerged, added by us"},
         {"UD", "unmerged, deleted by them"},
