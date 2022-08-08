@@ -138,6 +138,7 @@ public class TabGitChangesTemplate {
 	
 	private static void UpdateElementsBySelections() {
 		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		var nonPushedCommits = UniGit.TabGitChanges.nonPushedCommits;
 		int selectedCount = filesStatus.FindAll(f => f.isSelected).Count;
 		int totalCount = filesStatus.Count;
 
@@ -152,11 +153,11 @@ public class TabGitChangesTemplate {
 			buttonPushCommits.RemoveFromClassList(UniGitWindow.Classes.DisplayNoneClass);
 		}
 
-		if (UniGit.nonPushedCommits.Count == 0) {
+		if (nonPushedCommits.Count == 0) {
 			buttonPushCommits.AddToClassList(UniGitWindow.Classes.DisplayNoneClass);
 		} else {
-			buttonPushCommits.text = $"Push commits ({UniGit.nonPushedCommits.Count})";
-			buttonPushCommits.tooltip = $"You have {UniGit.nonPushedCommits.Count} commits without push";
+			buttonPushCommits.text = $"Push commits ({nonPushedCommits.Count})";
+			buttonPushCommits.tooltip = $"You have {nonPushedCommits.Count} commits without push";
 		}
 	}
 
@@ -212,6 +213,7 @@ public class TabGitChangesTemplate {
 		if (!commited)
 			return;
 
+		textFieldCommit.value = "";
 		RefreshTemplate();
 	}
 

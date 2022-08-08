@@ -25,11 +25,28 @@ public static class UniGit {
     public static class TabGitChanges {
         
         public static List<GitFileStatus> filesStatus;
+        public static List<string> nonPushedCommits;
+
 
         public static void LoadData() {
+            
+            // Get non pushed commits
+            var nonPushedCommitsExec = ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
+            var localCommits = nonPushedCommitsExec.result.Split("\n");
+            
             // Get files with status
             var statusExec = ExecuteProcessTerminal("status -u -s", "git");
             var gitStatus = statusExec.result.Split("\n");
+            
+            // Fill non pushed commits
+            nonPushedCommits = new List<string>();
+
+            foreach (var commit in localCommits) {
+                if(string.IsNullOrEmpty(commit))
+                    continue;
+            
+                nonPushedCommits.Add(commit);
+            }
             
             // Fill data with path & status
             filesStatus = new List<GitFileStatus>();
@@ -55,7 +72,6 @@ public static class UniGit {
     
     public static List<string> branches;
     
-    public static List<string> nonPushedCommits;
 
     public static int currentBranchOptionIdx;
     public static int newBranchOptionIdx;
@@ -84,10 +100,6 @@ public static class UniGit {
         var branchesExec = ExecuteProcessTerminal( "branch -a --no-color", "git");
         string branchesStg = branchesExec.result;
         
-        // Get non pushed commits
-        var nonPushedCommitsExec = ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
-        var localCommits = nonPushedCommitsExec.result.Split("\n");
-        
         // Get refs
         var gitRefExec = ExecuteProcessTerminal( "for-each-ref --sort -committerdate --format \"%(refname) %(objectname) %(*objectname)\"", "git");
 
@@ -110,16 +122,6 @@ public static class UniGit {
             
             branches.Add("New branch...");
             newBranchOptionIdx = branches.Count - 1;
-        }
-        
-        // Fill non pushed commits
-        nonPushedCommits = new List<string>();
-
-        foreach (var commit in localCommits) {
-            if(string.IsNullOrEmpty(commit))
-                continue;
-            
-            nonPushedCommits.Add(commit);
         }
         
         // Fix refs
