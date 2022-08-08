@@ -23,8 +23,24 @@ public struct GitFileStatus {
 public static class UniGit {
 
     public static class TabGitChanges {
+        
+        public static List<GitFileStatus> filesStatus;
+
         public static void LoadData() {
+            // Get files with status
+            var statusExec = ExecuteProcessTerminal("status -u -s", "git");
+            var gitStatus = statusExec.result.Split("\n");
             
+            // Fill data with path & status
+            filesStatus = new List<GitFileStatus>();
+
+            foreach (var fileStatusWithPath in gitStatus) {
+			
+                if(string.IsNullOrEmpty(fileStatusWithPath))
+                    continue;
+			
+                filesStatus.Add(GetFileStatus(fileStatusWithPath));
+            }
         }
     }
     
@@ -38,7 +54,6 @@ public static class UniGit {
     public static readonly string ORIGIN_NAME = "origin";
     
     public static List<string> branches;
-    public static List<GitFileStatus> filesStatus;
     
     public static List<string> nonPushedCommits;
 
@@ -68,10 +83,6 @@ public static class UniGit {
         // Get repository local branches
         var branchesExec = ExecuteProcessTerminal( "branch -a --no-color", "git");
         string branchesStg = branchesExec.result;
-
-        // Get files with status
-        var statusExec = ExecuteProcessTerminal("status -u -s", "git");
-        var gitStatus = statusExec.result.Split("\n");
         
         // Get non pushed commits
         var nonPushedCommitsExec = ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
@@ -109,17 +120,6 @@ public static class UniGit {
                 continue;
             
             nonPushedCommits.Add(commit);
-        }
-        
-        // Fill data with path & status
-        filesStatus = new List<GitFileStatus>();
-
-        foreach (var fileStatusWithPath in gitStatus) {
-			
-            if(string.IsNullOrEmpty(fileStatusWithPath))
-                continue;
-			
-            filesStatus.Add(GetFileStatus(fileStatusWithPath));
         }
         
         // Fix refs

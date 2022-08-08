@@ -31,6 +31,8 @@ public class TabGitChangesTemplate {
 		var Template = UIAsset.Instantiate();
 		container.Add(Template);
 
+		UniGit.TabGitChanges.LoadData();
+		
 		RegisterElements(Template);
 		SetupTemplateElements(Template);
 		UpdateElementsBySelections();
@@ -52,6 +54,9 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void SetupTemplateElements(VisualElement container) {
+		
+		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		
 		buttonAll.RegisterCallback<ClickEvent>(_ => SelectAllListElements(true));
 		buttonNone.RegisterCallback<ClickEvent>(_ => SelectAllListElements(false));
 		buttonPull.RegisterCallback<ClickEvent>(_ => OnPressPull());
@@ -73,11 +78,11 @@ public class TabGitChangesTemplate {
 			FileStatusTemplate.BindProperties properties;
 			
 			void Callback(ChangeEvent<bool> evt) => OnClickFileToogle(i);
-			void OnClickResolve(int idx) => OnClickResolveMergeError(UniGit.filesStatus[idx]);
+			void OnClickResolve(int idx) => OnClickResolveMergeError(filesStatus[idx]);
 			
 			properties.Target = e;
 			properties.Idx = i;
-			properties.gitFileStatus = UniGit.filesStatus[i];
+			properties.gitFileStatus = filesStatus[i];
 			properties.OnClickToogleFile = Callback; 
 			properties.OnClickShowInExplorer = ShowInExplorer; 
 			properties.OnClickPingFile = PingFile; 
@@ -86,21 +91,22 @@ public class TabGitChangesTemplate {
 			
 			FileStatusTemplate.BindItem(properties);
 		};
-		listViewContainer.itemsSource = UniGit.filesStatus;
+		listViewContainer.itemsSource = filesStatus;
 	}
 
 	private static void UpdateSelections(KeyDownEvent evt) {
-		// Skip if have not valid imputs v2
-		if(evt.keyCode != KeyCode.Space || isFocusedTextField)
-			return;
-		
+		var filesStatus = UniGit.TabGitChanges.filesStatus;
 		var selectedIndices = listViewContainer.selectedIndices.ToArray();
+		
+		// Skip if have not valid imputs v2
+		if(evt.keyCode != KeyCode.Space || isFocusedTextField || selectedIndices.Length == 0)
+			return;
 
 		if (selectedIndices.Count() > 1) {
 
 			bool selected;
 			// Number of items that has the checkbox active
-			int selectedCount = selectedIndices.Select(idx => UniGit.filesStatus[idx]).Count(item => item.isSelected);
+			int selectedCount = selectedIndices.Select(idx => filesStatus[idx]).Count(item => item.isSelected);
 
 			if (selectedCount == selectedIndices.Length || selectedCount == 0) {
 				// Select / deselect all
@@ -112,27 +118,28 @@ public class TabGitChangesTemplate {
 
 			// Update selected files based on first item selected
 			foreach (var idx in selectedIndices) {
-				var gitFileStatus = UniGit.filesStatus[idx];
+				var gitFileStatus = filesStatus[idx];
 				gitFileStatus.isSelected = selected;
 
-				UniGit.filesStatus[idx] = gitFileStatus;
+				filesStatus[idx] = gitFileStatus;
 			}
 		} else {
 			int idx = selectedIndices.ElementAt(0);
 			
 			// Change file state
-			var fileStatus = UniGit.filesStatus[idx];
+			var fileStatus = filesStatus[idx];
 			fileStatus.isSelected = !fileStatus.isSelected;
 
-			UniGit.filesStatus[idx] = fileStatus;
+			filesStatus[idx] = fileStatus;
 		}
 		
 		listViewContainer.RefreshItems();
 	}
 	
 	private static void UpdateElementsBySelections() {
-		int selectedCount = UniGit.filesStatus.FindAll(f => f.isSelected).Count;
-		int totalCount = UniGit.filesStatus.Count;
+		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		int selectedCount = filesStatus.FindAll(f => f.isSelected).Count;
+		int totalCount = filesStatus.Count;
 
 		string filesSelectedTxt = selectedCount > 1 ? "files" : "file";
 		string filesTotalTxt = totalCount > 1 ? "files" : "file";
@@ -154,11 +161,12 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void SelectAllListElements(bool select) {
-		for (var i = 0; i < UniGit.filesStatus.Count; i++) {
-			var fileStatus = UniGit.filesStatus[i];
+		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		for (var i = 0; i < filesStatus.Count; i++) {
+			var fileStatus = filesStatus[i];
 			fileStatus.isSelected = select;
 
-			UniGit.filesStatus[i] = fileStatus;
+			filesStatus[i] = fileStatus;
 		}
 
 		listViewContainer.RefreshItems();
@@ -185,7 +193,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void OnPressCommitSelected() {
-		var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected).ToArray();
+		var filesSelected = UniGit.TabGitChanges.filesStatus.FindAll(f => f.isSelected).ToArray();
 		var filesPath = new string[filesSelected.Length];
 
 		for (int i = 0; i < filesSelected.Length; i++) {
@@ -216,7 +224,7 @@ public class TabGitChangesTemplate {
 
 	private static void RefreshTemplate() {
 		UniGit.TabGitChanges.LoadData();
-		listViewContainer.itemsSource = UniGit.filesStatus;
+		listViewContainer.itemsSource = UniGit.TabGitChanges.filesStatus;
 		listViewContainer.RefreshItems();
 		UpdateElementsBySelections();
 	}
@@ -226,10 +234,10 @@ public class TabGitChangesTemplate {
 	#region FileStatusTemplateCallbacks
 
 	private static void OnClickFileToogle(int idx) {
-		var gitFileStatus = UniGit.filesStatus[idx];
+		var gitFileStatus = UniGit.TabGitChanges.filesStatus[idx];
 		gitFileStatus.isSelected = !gitFileStatus.isSelected;
 
-		UniGit.filesStatus[idx] = gitFileStatus;
+		UniGit.TabGitChanges.filesStatus[idx] = gitFileStatus;
 
 		listViewContainer.RefreshItem(idx);
 
@@ -242,7 +250,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void ShowInExplorer(int idx) {
-		var fileStatus = UniGit.filesStatus[idx];
+		var fileStatus = UniGit.TabGitChanges.filesStatus[idx];
 
 		Debug.Log("Opening file at path: " + fileStatus.GetFullPath());
 		EditorUtility.RevealInFinder(fileStatus.path);
@@ -250,7 +258,7 @@ public class TabGitChangesTemplate {
 
 	private static void PingFile(DropdownMenuAction aStatus) {
 		var idx = (int) aStatus.userData;
-		var gitFileStatus = UniGit.filesStatus[idx];
+		var gitFileStatus = UniGit.TabGitChanges.filesStatus[idx];
 		EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
 	}
 
@@ -272,7 +280,7 @@ public class TabGitChangesTemplate {
 		var files = new GitFileStatus[selectedIndices.Count];
 
 		for (var i = 0; i < selectedIndices.Count; i++) {
-			files[i] = UniGit.filesStatus[selectedIndices[i]];
+			files[i] = UniGit.TabGitChanges.filesStatus[selectedIndices[i]];
 		}
 
 		string msg =
