@@ -50,8 +50,8 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		menu.AddItem(content, false, () => DrawWindow(true));
 	}
 
-	private void DrawWindow(bool requireLoadData) {
-		if(requireLoadData)
+	public void DrawWindow(bool reloadLoadData) {
+		if(reloadLoadData)
 			UniGit.LoadData(this);
 		
 		VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
@@ -69,8 +69,8 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		}
 		
 		// Header
-		UniGitWindowTemplate.labelBranch.text = UniGit.currentBranch;
-		UniGit.currentBranchOptionIdx = UniGit.branches.IndexOf(UniGit.currentBranch);
+		UniGitWindowTemplate.labelBranch.text = UniGit.currentBranchName;
+		UniGit.currentBranchOptionIdx = UniGit.branches.IndexOf(UniGit.currentBranchName);
 		UniGitWindowTemplate.dropdownBranches.index = UniGit.currentBranchOptionIdx;
 		UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
 		UniGitWindowTemplate.dropdownBranches.choices = UniGit.branches;
@@ -96,7 +96,7 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 	private void LoadTab(int tabIdx) {
 
 		if (tabIdx is 1 or 2) {
-			Debug.Log("not implemented");
+			Debug.LogWarning("not implemented");
 			return;
 		}
 
@@ -115,14 +115,26 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 	
 	private void OnChangeDropdownOptionValue(ChangeEvent<string> evt) {
 
+		if (UniGitWindowTemplate.dropdownBranches.index == UniGit.currentBranchOptionIdx) {
+			return;
+		}
+		
+		// For create branch
 		if (UniGitWindowTemplate.dropdownBranches.index == UniGit.newBranchOptionIdx) {
-			Debug.Log("Creating new branch");
+			CreateBranchWindow.OpenPopUp(UniGit.currentBranchName, UniGit.branches);
 			UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
 			return;
 		}
 
+		// For switch into a branch
+		bool switched = UniGit.SwitchToBranch(UniGitWindowTemplate.dropdownBranches.index);
+
+		if (!switched) {
+			UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
+			return;
+		}
+		
 		UniGit.currentBranchOptionIdx = UniGitWindowTemplate.dropdownBranches.index;
-		Debug.Log("Selected: "+UniGitWindowTemplate.dropdownBranches.index);
 	}
 	
 }

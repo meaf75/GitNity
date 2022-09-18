@@ -183,7 +183,7 @@ public class TabGitChangesTemplate {
 		// Check if current branch has upstream branch
 		var output =
 			UniGit.ExecuteProcessTerminal(
-				$"pull {UniGit.ORIGIN_NAME} {UniGit.currentBranch} --allow-unrelated-histories", "git");
+				$"pull {UniGit.ORIGIN_NAME} {UniGit.currentBranchName} --allow-unrelated-histories", "git");
 		Debug.Log("Pull output: " + output.result);
 	}
 

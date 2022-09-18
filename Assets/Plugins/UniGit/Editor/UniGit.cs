@@ -62,7 +62,7 @@ public static class UniGit {
     }
     
     public static string pluginPath;
-    public static string currentBranch;
+    public static string currentBranchName;
     
     public static string localRef;
     public static string remoteRef;
@@ -94,7 +94,7 @@ public static class UniGit {
         
         // Get use current branch
         var currBranchExec = ExecuteProcessTerminal( "branch --show-current", "git");
-        currentBranch = currBranchExec.result.Split("\n")[0];
+        currentBranchName = currBranchExec.result.Split("\n")[0];
 		
         // Get repository local branches
         var branchesExec = ExecuteProcessTerminal( "branch -a --no-color", "git");
@@ -105,7 +105,7 @@ public static class UniGit {
 
         // Fill branch & all branches available
         if (string.IsNullOrEmpty(branchesStg)) {
-            branches = new List<string>{$"{currentBranch}","New branch..."};
+            branches = new List<string>{$"{currentBranchName}","New branch..."};
             currentBranchOptionIdx = 0;
             newBranchOptionIdx = 1;
         } else {
@@ -118,7 +118,7 @@ public static class UniGit {
                 branches.Add(branch.Substring(2));
             }
 
-            currentBranchOptionIdx = branches.IndexOf(currentBranch);
+            currentBranchOptionIdx = branches.IndexOf(currentBranchName);
             
             branches.Add("New branch...");
             newBranchOptionIdx = branches.Count - 1;
@@ -140,9 +140,9 @@ public static class UniGit {
                 gitRefs.Add(refData[0], refData[1]);
 
                 // Filter current ref path
-                if (refPath == $"refs/heads/{currentBranch}") {
+                if (refPath == $"refs/heads/{currentBranchName}") {
                     localRef = refPath;
-                } else if (refPath == $"refs/remotes/{ORIGIN_NAME}/{currentBranch}") {
+                } else if (refPath == $"refs/remotes/{ORIGIN_NAME}/{currentBranchName}") {
                     remoteRef = refPath;
                 }
             }
@@ -340,13 +340,13 @@ public static class UniGit {
         var gitUpstreamBranchExec = ExecuteProcessTerminal( "status -sb", "git");
         var gitPushArg = gitUpstreamBranchExec.result.Split("\n")[0].Contains("...")	// If contains "..." means that current branch has upstream branch 
             ? "push" : 
-            $"push -u {ORIGIN_NAME} {currentBranch}";
+            $"push -u {ORIGIN_NAME} {currentBranchName}";
         
         // Send changes
         var exec = ExecuteProcessTerminal(gitPushArg, "git");
         
         if (exec.status == 0) {
-            Debug.Log($"<color=green>Pushed changes ✔✔✔, {exec.result}</color>");
+            Debug.Log($"<color=green>Changes pushed ✔✔✔, {exec.result}</color>");
             return true;
         }
         
@@ -354,6 +354,28 @@ public static class UniGit {
         return false;
     }
 
+    public static bool BranchExist(string branchName) {
+        var exec = ExecuteProcessTerminal2($"rev-parse --verify {branchName}", "git");
+        return exec.status == 0;
+    }
+    
+    public static bool CreateBranch(string branchName, string fromBranch, bool checkoutToBranch) {
+
+        (string result, int status) exec;
+        
+        if (checkoutToBranch) {
+            exec = ExecuteProcessTerminal2($"checkout -b {branchName} {fromBranch}", "git");
+        } else {
+            exec = ExecuteProcessTerminal2($"branch {branchName} {fromBranch}", "git");
+        }
+
+        if (exec.status != 0) {
+            Debug.LogWarning($"Create file with checkout={checkoutToBranch} throw: "+exec.result);    
+        }
+        
+        return exec.status == 0;
+    }
+    
     public static bool RevertFiles(GitFileStatus[] files) {
         string[] paths = files.Select(f => $"\"{f.GetFullPath()}\"").ToArray();
         var exec = ExecuteProcessTerminal2($"clean -f -q -- {string.Join(" ", paths)}", "git");
@@ -366,6 +388,19 @@ public static class UniGit {
         Debug.LogWarning("Revert files throw: "+exec.result);
         return false;
 
+    }
+
+    public static bool SwitchToBranch(int branchIdx) {
+        string branchName = branches[branchIdx];
+        var exec = ExecuteProcessTerminal2($"checkout {branchName}", "git");
+
+        if (exec.status == 0) {
+            Debug.Log($"<color=green>Checkout to {branchName}</color>");
+            return true;
+        }
+        
+        Debug.LogWarning("Checkout branch throw: "+exec.result);
+        return false;
     }
     #endregion
 
