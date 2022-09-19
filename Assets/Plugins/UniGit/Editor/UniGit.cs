@@ -185,9 +185,9 @@ public static class UniGit {
             return trackStatus;
         }
 
-        char WorkTree = trackStatus.trackedPathStatus[0];
+        char StatusIndex = trackStatus.trackedPathStatus[0];
 
-        var workTreeStatus = GetLabelWithColorByStatus(WorkTree);
+        var workTreeStatus = GetLabelWithColorByStatus(StatusIndex);
 
         if (UnmergedStatus.ContainsKey(trackStatus.trackedPathStatus)) {
             // Merge error
@@ -195,9 +195,9 @@ public static class UniGit {
             trackStatus.statusName = $"Merge error;{UnmergedStatus[trackStatus.trackedPathStatus]} ({workTreeStatus.status})";
             trackStatus.statusColor = Color.red;
         } else {
-            // Merge error
-            trackStatus.statusName = "Unknown";
-            trackStatus.statusColor = Color.black;
+            // Index + Worktree
+            trackStatus.statusName = workTreeStatus.status;
+            trackStatus.statusColor = workTreeStatus.statusColor;
         }
         
 
@@ -211,7 +211,7 @@ public static class UniGit {
             case 'T': return ("Type changed", new Color(0,0.6557204f,0.6901961f));
             case 'R': return ("Renamed", new Color(0.662169f, 0, 0.6901961f));
             case 'C': return ("Copied", new Color(0.6901961f, 0.6089784f, 0));
-            case 'A': return ("New", new Color(0.06309456f, 0.6901961f, 0));
+            case 'A': return ("New", new Color(0.06f, 0.53f, 0f));
         }
         
         return ($"Unknown ({status})", Color.black);

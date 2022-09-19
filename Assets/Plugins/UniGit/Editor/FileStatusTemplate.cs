@@ -108,7 +108,7 @@ public static class FileStatusTemplate {
 
     private static VisualTreeAsset GetTemplate() {
 	    if(!template)
-			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/FileStatusItem.uxml");
+			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
 
 	    return template;
     }

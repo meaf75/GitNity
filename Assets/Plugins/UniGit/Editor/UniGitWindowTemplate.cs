@@ -19,7 +19,6 @@ public static class UniGitWindowTemplate
         
         tabs = new [] {
             root.Q<Button>("tab-changes"),
-            root.Q<Button>("tab-incomming"),
             root.Q<Button>("tab-commits")
         };
     }

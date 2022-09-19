@@ -19,14 +19,12 @@ public class TabGitChangesTemplate {
 	private static Label labelSelectedCount;
 
 	private static ListView listViewContainer;
-
-	private static VisualTreeAsset UIAsset;
-
+	
 	private static bool isFocusedTextField;
 
 	// Start is called before the first frame update
 	public static VisualElement RenderTemplate(UniGitWindow uniGitWindow, VisualElement container) {
-		UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+		var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
 			$"{UniGit.GetPluginPath(uniGitWindow)}/Templates/TabGitChanges.uxml");
 		var Template = UIAsset.Instantiate();
 		container.Add(Template);

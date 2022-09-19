@@ -35,7 +35,7 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		GUIContent titleContent = new GUIContent ("UniGit", icon);
 		
 		window.titleContent = titleContent;
-		window.minSize = new Vector2(372, 286);
+		window.minSize = new Vector2(640, 286);
 	}
 	
 	private void CreateGUI() {
@@ -94,20 +94,13 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 	}
 
 	private void LoadTab(int tabIdx) {
-
-		if (tabIdx is 1 or 2) {
-			Debug.LogWarning("not implemented");
-			return;
-		}
-
 		VisualElement TabContent;
 		UniGitWindowTemplate.tabContent.Clear();
 		
 		if (tabIdx == 0) {
 			TabContent = TabGitChangesTemplate.RenderTemplate(this,UniGitWindowTemplate.tabContent);
 		} else {
-			Debug.LogWarning("Unknown tab");
-			return;
+			TabContent = TabGitCommits.RenderTemplate(this,UniGitWindowTemplate.tabContent);
 		}
 		
 		TabContent.AddToClassList(Classes.FullHeightClass);
@@ -130,6 +123,10 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		bool switched = UniGit.SwitchToBranch(UniGitWindowTemplate.dropdownBranches.index);
 
 		if (!switched) {
+			EditorUtility.DisplayDialog("Error switching branch",
+				$"An error ocurred trying to change into the {UniGit.branches[UniGitWindowTemplate.dropdownBranches.index]} branch, please check the warning logs",
+				"ok");
+			
 			UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
 			return;
 		}
