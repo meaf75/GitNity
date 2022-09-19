@@ -7,6 +7,7 @@ Git integration for Unity projects
 - [x] Push pending commits
 - [x] Fetch changes
 - [x] Create & switch branch
+- [x] Display git commits, filter by branch
 - [ ] Context Menu on right click on an asset
 - [ ] Display status icon on files with modifications or tracked by git
 

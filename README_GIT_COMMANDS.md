@@ -68,3 +68,12 @@ Here is a list of commands used to populate window data or execute some git oper
     ``` sh
     git branch BRANCH_NAME FROM_BRANCH_NAME
     ```
+  
+- Get commits behind
+    ``` sh
+    git status -b --porcelain=v2
+    ```
+  
+    ``` sh
+    git branch BRANCH_NAME FROM_BRANCH_NAME
+    ```

@@ -21,6 +21,10 @@ public class TabGitChangesTemplate {
 	private static ListView listViewContainer;
 	
 	private static bool isFocusedTextField;
+	
+	private static int commitsBehind = 0;
+	private static string branchUpstream = "";
+
 
 	// Start is called before the first frame update
 	public static VisualElement RenderTemplate(UniGitWindow uniGitWindow, VisualElement container) {
@@ -29,6 +33,7 @@ public class TabGitChangesTemplate {
 		var Template = UIAsset.Instantiate();
 		container.Add(Template);
 
+		LoadData();
 		UniGit.TabGitChanges.LoadData();
 		
 		RegisterElements(Template);
@@ -38,6 +43,24 @@ public class TabGitChangesTemplate {
 		return Template;
 	}
 
+	private static void LoadData() {
+		// Commits behind
+		var statusBranchExec = UniGit.ExecuteProcessTerminal( $"status -b --porcelain=v2", "git");
+		var statusOutputLines = statusBranchExec.result.Split("\n");
+
+		foreach (var statusOutputLine in statusOutputLines) {
+			if (statusOutputLine.Contains("branch.ab")) {
+				var parts = statusOutputLine.Split(" ");
+				commitsBehind = int.Parse(parts[3][1..]);
+			}
+			
+			if (statusOutputLine.Contains("branch.upstream")) {
+				var parts = statusOutputLine.Split(" ");
+				branchUpstream = parts[2];
+			}
+		}
+	}
+	
 	private static void RegisterElements(VisualElement root) {
 		textFieldCommit = root.Q<TextField>("textfield-commit");
 		labelSelectedCount = root.Q<Label>("label-selected-count");
@@ -67,6 +90,13 @@ public class TabGitChangesTemplate {
 
 		container.RegisterCallback<KeyDownEvent>(UpdateSelections,TrickleDown.TrickleDown);
 
+		buttonPull.text = commitsBehind > 0 ? 
+			$"Pull changes ({commitsBehind})" : 
+			"Pull changes";
+		
+		buttonPull.tooltip = commitsBehind > 0 ? 
+			$"You are {commitsBehind} {(commitsBehind == 1 ? "commit" : "commits")} behind {branchUpstream}" : 
+			"Seem like there is nothing to pull";
 		
 		// Generate modified files
 		listViewContainer.fixedItemHeight = 21;
@@ -179,10 +209,18 @@ public class TabGitChangesTemplate {
 		Debug.Log("Pulling data");
 
 		// Check if current branch has upstream branch
-		var output =
+		var exec =
 			UniGit.ExecuteProcessTerminal(
 				$"pull {UniGit.ORIGIN_NAME} {UniGit.currentBranchName} --allow-unrelated-histories", "git");
-		Debug.Log("Pull output: " + output.result);
+
+		if (exec.status != 0) {
+			Debug.LogWarning("Pull changes throw: "+exec.result);
+			return;
+		}
+			
+		Debug.Log($"<color=green>New changes pulled ✔✔✔</color>");
+		
+		RefreshTemplate();
 	}
 
 	private static void OnPressFetch() {

@@ -22,7 +22,6 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 
 	private static UniGitWindow window;
 
-	
 	private int currentTab = 0;
 	
 	[MenuItem("Tools/UniGit/UniGit window")]
@@ -51,8 +50,9 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 	}
 
 	public void DrawWindow(bool reloadLoadData) {
-		if(reloadLoadData)
+		if (reloadLoadData) {
 			UniGit.LoadData(this);
+		}
 		
 		VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
 		var TemplateContainer = uiAsset.Instantiate();
