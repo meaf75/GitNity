@@ -89,14 +89,6 @@ public class TabGitChangesTemplate {
 		textFieldCommit.RegisterCallback<FocusOutEvent>(_ => isFocusedTextField = false);
 
 		container.RegisterCallback<KeyDownEvent>(UpdateSelections,TrickleDown.TrickleDown);
-
-		buttonPull.text = commitsBehind > 0 ? 
-			$"Pull changes ({commitsBehind})" : 
-			"Pull changes";
-		
-		buttonPull.tooltip = commitsBehind > 0 ? 
-			$"You are {commitsBehind} {(commitsBehind == 1 ? "commit" : "commits")} behind {branchUpstream}" : 
-			"Seem like there is nothing to pull";
 		
 		// Generate modified files
 		listViewContainer.fixedItemHeight = 21;
@@ -120,8 +112,20 @@ public class TabGitChangesTemplate {
 			FileStatusTemplate.BindItem(properties);
 		};
 		listViewContainer.itemsSource = filesStatus;
+		
+		RefreshPullButton();
 	}
 
+	private static void RefreshPullButton() {
+		buttonPull.text = commitsBehind > 0 ? 
+			$"Pull changes ({commitsBehind})" : 
+			"Pull changes";
+		
+		buttonPull.tooltip = commitsBehind > 0 ? 
+			$"You are {commitsBehind} {(commitsBehind == 1 ? "commit" : "commits")} behind {branchUpstream}" : 
+			"Seem like there is nothing to pull";
+	}
+	
 	private static void UpdateSelections(KeyDownEvent evt) {
 		var filesStatus = UniGit.TabGitChanges.filesStatus;
 		var selectedIndices = listViewContainer.selectedIndices.ToArray();
@@ -262,9 +266,11 @@ public class TabGitChangesTemplate {
 
 	private static void RefreshTemplate() {
 		UniGit.TabGitChanges.LoadData();
+		LoadData();
 		listViewContainer.itemsSource = UniGit.TabGitChanges.filesStatus;
 		listViewContainer.RefreshItems();
 		UpdateElementsBySelections();
+		RefreshPullButton();
 	}
 
 	#endregion
