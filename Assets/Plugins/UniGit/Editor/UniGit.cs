@@ -11,71 +11,69 @@ using Debug = UnityEngine.Debug;
 
 public delegate void OneParamDelegate<in T>(T param);
 
+public enum StatusType {
+    UNKNOWN = 0,
+    NEW = 1,
+    MODIFIED = 2,
+    DELETED = 3,
+    TYPE_CHANGED = 4,
+    RENAMED = 5,
+    COPIED = 6,
+    MERGE_ERROR = 7
+};
+
 public struct GitFileStatus {
     public bool isMergeError;
     public bool isSelected;
     public string statusName;
     public string trackedPathStatus;
     public Color statusColor;
+    public StatusType statusType;
     public string path;
+    public string guid;
 }
 
+[InitializeOnLoad]
 public static class UniGit {
 
-    public static class TabGitChanges {
-        
-        public static List<GitFileStatus> filesStatus;
-        public static List<string> nonPushedCommits;
+    private const string EMPTY_GUI = "00000000000000000000000000000000";
+    
+    private static readonly string[] StatusIcons = {
+        "d_CollabCreate Icon",  // Unknown
+        "d_CollabCreate Icon",  // New
+        "d_CollabEdit Icon",    // Modified
+        "d_CollabDeleted Icon", // Deleted
+        "d_CollabMoved Icon",   // Type changed
+        "d_CollabMoved Icon",   // Renamed
+        "d_CollabMoved Icon",   // Copied
+        "d_CollabConflict Icon" // Merge_error
+    };
 
-
-        public static void LoadData() {
-            
-            // Get non pushed commits
-            var nonPushedCommitsExec = ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
-            var localCommits = nonPushedCommitsExec.result.Split("\n");
-            
-            // Get files with status
-            var statusExec = ExecuteProcessTerminal("status -u -s", "git");
-            var gitStatus = statusExec.result.Split("\n");
-            
-            // Fill non pushed commits
-            nonPushedCommits = new List<string>();
-
-            foreach (var commit in localCommits) {
-                if(string.IsNullOrEmpty(commit))
-                    continue;
-            
-                nonPushedCommits.Add(commit);
-            }
-            
-            // Fill data with path & status
-            filesStatus = new List<GitFileStatus>();
-
-            foreach (var fileStatusWithPath in gitStatus) {
-			
-                if(string.IsNullOrEmpty(fileStatusWithPath))
-                    continue;
-			
-                filesStatus.Add(GetFileStatus(fileStatusWithPath));
-            }
-        }
-    }
+    private const string MODIFIED_FOLDER_ICON_NAME = "sv_icon_dot1_pix16_gizmo"; 
+    
+    public static List<GitFileStatus> filesStatus;
     
     public static string pluginPath;
     public static string currentBranchName;
     
-    public static string localRef;
-    public static string remoteRef;
     public static Dictionary<string,string> gitRefs;
 
     public static readonly string ORIGIN_NAME = "origin";
     
     public static List<string> branches;
+
+    /// <summary> Reference of all the paths registered and marked their tree folders as modified </summary>
+    private static readonly List<string> pathsRegistered;
     
+    /// <summary> GUID of folders inside the editor to mark them as modified on gui </summary>
+    private static readonly List<string> pathsGuidRegistered;
 
     public static int currentBranchOptionIdx;
     public static int newBranchOptionIdx;
 
+    /// <summary>
+    /// More icons at: https://github.com/Zxynine/UnityEditorIcons
+    /// </summary>
     private static readonly Dictionary<string, string> UnmergedStatus = new() {
         {"DD", "unmerged, both deleted"},
         {"AU", "unmerged, added by us"},
@@ -85,12 +83,52 @@ public static class UniGit {
         {"AA", "unmerged, both added"},
         {"UU", "unmerged, both modified"},
     };
+
+    static UniGit() {
+        pathsRegistered = new List<string>();
+        pathsGuidRegistered = new List<string>();
+        
+        RefreshFilesStatus();
+        EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
+    }
+    
+    /// <summary> Draw git status icon over item </summary>
+    private static void ProjectWindowItemOnGUI(string guid, Rect rect) {
+
+        if(guid == EMPTY_GUI)
+            return;
+        
+        var versionedItemIdx = filesStatus.FindIndex(f => f.guid == guid);
+        int modifiedFolderIdx = pathsGuidRegistered.IndexOf(guid);
+        
+        if(versionedItemIdx == -1 && modifiedFolderIdx == -1)
+            return;
+
+        bool isSmallItem = rect.width > rect.height;
+            
+        float size = isSmallItem ? 10 : rect.width * .4f;
+
+        var iconSize = new Rect(rect.x, rect.y, size, size);
+        string iconName = "";
+
+        var color = GUI.color;
+
+        if (modifiedFolderIdx != -1) {
+            GUI.color = Color.blue;
+        }
+        
+        GUI.color = color;
+        
+        iconName = versionedItemIdx != -1 ? 
+            StatusIcons[(int) filesStatus[versionedItemIdx].statusType] : 
+            MODIFIED_FOLDER_ICON_NAME;
+
+        var icon = EditorGUIUtility.IconContent(iconName);
+        GUI.DrawTexture(iconSize, icon.image);
+    }
     
     public static void LoadData(UniGitWindow window) {
         pluginPath = GetPluginPath(window);
-
-        localRef = "";
-        remoteRef = "";
         
         // Get use current branch
         var currBranchExec = ExecuteProcessTerminal( "branch --show-current", "git");
@@ -138,17 +176,33 @@ public static class UniGit {
 
                 // Store ref data
                 gitRefs.Add(refData[0], refData[1]);
-
-                // Filter current ref path
-                if (refPath == $"refs/heads/{currentBranchName}") {
-                    localRef = refPath;
-                } else if (refPath == $"refs/remotes/{ORIGIN_NAME}/{currentBranchName}") {
-                    remoteRef = refPath;
-                }
             }
         }
     }
-    
+
+    public static void RefreshFilesStatus() {
+        // Get files with status
+        var statusExec = ExecuteProcessTerminal("status -u -s", "git");
+        var gitStatus = statusExec.result.Split("\n");
+        
+        // Fill data with path & status
+        filesStatus = new List<GitFileStatus>();
+        pathsRegistered.Clear();
+        pathsGuidRegistered.Clear();
+
+        foreach (var fileStatusWithPath in gitStatus) {
+			
+            if(string.IsNullOrEmpty(fileStatusWithPath))
+                continue;
+
+            var trackStatus = GetFileStatus(fileStatusWithPath);
+            AddNewTrackedPath(trackStatus);
+            filesStatus.Add(trackStatus);
+        }
+
+        Debug.Log("Git files status refreshed");
+    }
+
     public static string GetPluginPath(EditorWindow target) {
         var script = MonoScript.FromScriptableObject(target);
         var assetPath = AssetDatabase.GetAssetPath(script).Split("/Editor");
@@ -161,16 +215,35 @@ public static class UniGit {
         GitFileStatus trackStatus;
         trackStatus.path = fileStatusWithPath[3..];
         trackStatus.isSelected = false;
+        
+        if(trackStatus.path.Contains("henlo"))
+            Debug.Log("sup bro");
+        
         trackStatus.isMergeError = false;
 
-        if (trackStatus.path.Contains("\""))    // Clear spaced paths
+        if (trackStatus.path.Contains("\""))    // Clear spaced paths 
             trackStatus.path = trackStatus.path.Replace("\"","");
         
         trackStatus.trackedPathStatus = fileStatusWithPath[..2];
 
+        // Get file guid
+        string fileGuidPath = trackStatus.path;
+        
+        if (trackStatus.path.EndsWith(".meta")) {   // Special treat for folders
+            string pathWithoutExtension = trackStatus.path.Replace(".meta", "");
+            if (AssetDatabase.IsValidFolder(pathWithoutExtension)) {
+                fileGuidPath = pathWithoutExtension;
+            }
+        }
+        
+        trackStatus.guid = AssetDatabase.GUIDFromAssetPath(fileGuidPath).ToString();
+
+        // Return status for untracked files
         if (trackStatus.trackedPathStatus == "??") {
             trackStatus.statusName = "Untracked";
             trackStatus.statusColor = Color.grey;
+            trackStatus.statusType = StatusType.UNKNOWN;
+            
             return trackStatus;
         }
 		
@@ -178,9 +251,10 @@ public static class UniGit {
         string clearedStatusFormat =  trackStatus.trackedPathStatus.Replace(" ", "");
 
         if (clearedStatusFormat.Length == 1) {
-            var labelAndcolor = GetLabelWithColorByStatus(clearedStatusFormat[0]);
-            trackStatus.statusColor = labelAndcolor.statusColor;
-            trackStatus.statusName = labelAndcolor.status;
+            var statusData = GetLabelWithColorByStatus(clearedStatusFormat[0]);
+            trackStatus.statusColor = statusData.statusColor;
+            trackStatus.statusName = statusData.status;
+            trackStatus.statusType = statusData.statusType;
 
             return trackStatus;
         }
@@ -194,27 +268,62 @@ public static class UniGit {
             trackStatus.isMergeError = true;
             trackStatus.statusName = $"Merge error;{UnmergedStatus[trackStatus.trackedPathStatus]} ({workTreeStatus.status})";
             trackStatus.statusColor = Color.red;
+            trackStatus.statusType = StatusType.MERGE_ERROR;
         } else {
             // Index + Worktree
             trackStatus.statusName = workTreeStatus.status;
             trackStatus.statusColor = workTreeStatus.statusColor;
+            trackStatus.statusType = workTreeStatus.statusType;
         }
-        
 
         return trackStatus;
     }
 
-    private static (string status, Color statusColor) GetLabelWithColorByStatus(char status) {
+    /// <summary> Try to register tree folders to mark them as modified on gui </summary>
+    private static void AddNewTrackedPath(GitFileStatus gitFileStatus) {
+
+        if (!gitFileStatus.path.Contains("Assets/"))   // Skip path tree
+            return;
+
+        string pathToTrack = "";
+        
+        if (AssetDatabase.IsValidFolder(gitFileStatus.path)) {
+            // Remove path 
+            pathToTrack = gitFileStatus.path;
+        } else {
+            // Remove file from path
+            pathToTrack = string.Join("/", gitFileStatus.path.Split("/")[..^1]);
+        }
+
+        if(pathsRegistered.Contains(pathToTrack))   // Skip tree path
+            return;
+        
+        int expectedPaths = pathToTrack.Split("/").Length;
+
+        for (int i = 0; i < expectedPaths; i++) {
+            string path = string.Join("/", pathToTrack.Split("/")[..^i]);
+            string guid = AssetDatabase.GUIDFromAssetPath(path).ToString(); 
+            
+            pathsRegistered.Add(path);
+            
+            if(guid != EMPTY_GUI)   // Register guid if is valid
+                pathsGuidRegistered.Add(guid);
+        }
+
+        Debug.Log(pathsRegistered);
+    }
+
+    private static (string status, Color statusColor, StatusType statusType) GetLabelWithColorByStatus(char status) {
         switch (status) {
-            case 'D': return ("Deleted", new Color(0.6901961f, 0.2991235f, 0));
-            case 'M': return ("Modified", new Color(0,0.4693986f,0.6886792f));
-            case 'T': return ("Type changed", new Color(0,0.6557204f,0.6901961f));
-            case 'R': return ("Renamed", new Color(0.662169f, 0, 0.6901961f));
-            case 'C': return ("Copied", new Color(0.6901961f, 0.6089784f, 0));
-            case 'A': return ("New", new Color(0.06f, 0.53f, 0f));
+            case 'D': return ("Deleted", new Color(0.6901961f, 0.2991235f, 0), StatusType.DELETED);
+            case 'M': return ("Modified", new Color(0,0.4693986f,0.6886792f), StatusType.MODIFIED);
+            case 'T': return ("Type changed", new Color(0,0.6557204f,0.6901961f), StatusType.TYPE_CHANGED);
+            case 'R': return ("Renamed", new Color(0.662169f, 0, 0.6901961f), StatusType.RENAMED);
+            case 'C': return ("Copied", new Color(0.6901961f, 0.6089784f, 0), StatusType.COPIED);
+            case 'A': return ("New", new Color(0.06f, 0.53f, 0f), StatusType.NEW);
         }
         
-        return ($"Unknown ({status})", Color.black);
+        return ($"Unknown ({status})", Color.black, StatusType.UNKNOWN);
     }
     
     public static (string result, int status) ExecuteProcessTerminal(string argument, string term) {

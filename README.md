@@ -3,9 +3,10 @@ Git integration for Unity projects
 
 # Features
 - [x] List changes (Modified, untracked, new, merge error)
-- [x] Commit selected files
+- [x] Commit files by selecting them
 - [x] Push pending commits
 - [x] Fetch changes
+- [x] Pull changes
 - [x] Create & switch branch
 - [x] Display git commits, filter by branch
 - [ ] Context Menu on right click on an asset

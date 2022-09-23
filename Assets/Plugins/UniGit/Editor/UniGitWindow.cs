@@ -37,9 +37,6 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		window.minSize = new Vector2(640, 286);
 	}
 	
-	private void CreateGUI() {
-	}
-
 	private void OnEnable() {
 		DrawWindow(true);
 	}
@@ -75,9 +72,13 @@ public class UniGitWindow : EditorWindow, IHasCustomMenu {
 		UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
 		UniGitWindowTemplate.dropdownBranches.choices = UniGit.branches;
 		UniGitWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
-		UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => DrawWindow(true));
+		UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => {
+			UniGit.RefreshFilesStatus();
+			DrawWindow(true);
+			Debug.Log("Data refreshed");
+		});
 		
-		LoadTab(0);
+		LoadTab(currentTab);
 	}
 	
 	private void OnPressTab(ClickEvent evt) {

@@ -24,7 +24,8 @@ public class TabGitChangesTemplate {
 	
 	private static int commitsBehind = 0;
 	private static string branchUpstream = "";
-
+	
+	public static List<string> nonPushedCommits;
 
 	// Start is called before the first frame update
 	public static VisualElement RenderTemplate(UniGitWindow uniGitWindow, VisualElement container) {
@@ -34,7 +35,6 @@ public class TabGitChangesTemplate {
 		container.Add(Template);
 
 		LoadData();
-		UniGit.TabGitChanges.LoadData();
 		
 		RegisterElements(Template);
 		SetupTemplateElements(Template);
@@ -59,6 +59,20 @@ public class TabGitChangesTemplate {
 				branchUpstream = parts[2];
 			}
 		}
+		
+		// Get non pushed commits
+		var nonPushedCommitsExec = UniGit.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
+		var localCommits = nonPushedCommitsExec.result.Split("\n");
+            
+		// Fill non pushed commits
+		nonPushedCommits = new List<string>();
+
+		foreach (var commit in localCommits) {
+			if(string.IsNullOrEmpty(commit))
+				continue;
+            
+			nonPushedCommits.Add(commit);
+		}
 	}
 	
 	private static void RegisterElements(VisualElement root) {
@@ -76,7 +90,7 @@ public class TabGitChangesTemplate {
 
 	private static void SetupTemplateElements(VisualElement container) {
 		
-		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		var filesStatus = UniGit.filesStatus;
 		
 		buttonAll.RegisterCallback<ClickEvent>(_ => SelectAllListElements(true));
 		buttonNone.RegisterCallback<ClickEvent>(_ => SelectAllListElements(false));
@@ -127,7 +141,7 @@ public class TabGitChangesTemplate {
 	}
 	
 	private static void UpdateSelections(KeyDownEvent evt) {
-		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		var filesStatus = UniGit.filesStatus;
 		var selectedIndices = listViewContainer.selectedIndices.ToArray();
 		
 		// Skip if have not valid imputs v2
@@ -169,8 +183,7 @@ public class TabGitChangesTemplate {
 	}
 	
 	private static void UpdateElementsBySelections() {
-		var filesStatus = UniGit.TabGitChanges.filesStatus;
-		var nonPushedCommits = UniGit.TabGitChanges.nonPushedCommits;
+		var filesStatus = UniGit.filesStatus;
 		int selectedCount = filesStatus.FindAll(f => f.isSelected).Count;
 		int totalCount = filesStatus.Count;
 
@@ -194,7 +207,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void SelectAllListElements(bool select) {
-		var filesStatus = UniGit.TabGitChanges.filesStatus;
+		var filesStatus = UniGit.filesStatus;
 		for (var i = 0; i < filesStatus.Count; i++) {
 			var fileStatus = filesStatus[i];
 			fileStatus.isSelected = select;
@@ -234,7 +247,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void OnPressCommitSelected() {
-		var filesSelected = UniGit.TabGitChanges.filesStatus.FindAll(f => f.isSelected).ToArray();
+		var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected).ToArray();
 		var filesPath = new string[filesSelected.Length];
 
 		for (int i = 0; i < filesSelected.Length; i++) {
@@ -265,9 +278,8 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void RefreshTemplate() {
-		UniGit.TabGitChanges.LoadData();
 		LoadData();
-		listViewContainer.itemsSource = UniGit.TabGitChanges.filesStatus;
+		listViewContainer.itemsSource = UniGit.filesStatus;
 		listViewContainer.RefreshItems();
 		UpdateElementsBySelections();
 		RefreshPullButton();
@@ -278,10 +290,10 @@ public class TabGitChangesTemplate {
 	#region FileStatusTemplateCallbacks
 
 	private static void OnClickFileToogle(int idx) {
-		var gitFileStatus = UniGit.TabGitChanges.filesStatus[idx];
+		var gitFileStatus = UniGit.filesStatus[idx];
 		gitFileStatus.isSelected = !gitFileStatus.isSelected;
 
-		UniGit.TabGitChanges.filesStatus[idx] = gitFileStatus;
+		UniGit.filesStatus[idx] = gitFileStatus;
 
 		listViewContainer.RefreshItem(idx);
 
@@ -294,7 +306,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void ShowInExplorer(int idx) {
-		var fileStatus = UniGit.TabGitChanges.filesStatus[idx];
+		var fileStatus = UniGit.filesStatus[idx];
 
 		Debug.Log("Opening file at path: " + fileStatus.GetFullPath());
 		EditorUtility.RevealInFinder(fileStatus.path);
@@ -302,7 +314,7 @@ public class TabGitChangesTemplate {
 
 	private static void PingFile(DropdownMenuAction aStatus) {
 		var idx = (int) aStatus.userData;
-		var gitFileStatus = UniGit.TabGitChanges.filesStatus[idx];
+		var gitFileStatus = UniGit.filesStatus[idx];
 		EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
 	}
 
@@ -324,7 +336,7 @@ public class TabGitChangesTemplate {
 		var files = new GitFileStatus[selectedIndices.Count];
 
 		for (var i = 0; i < selectedIndices.Count; i++) {
-			files[i] = UniGit.TabGitChanges.filesStatus[selectedIndices[i]];
+			files[i] = UniGit.filesStatus[selectedIndices[i]];
 		}
 
 		string msg =
