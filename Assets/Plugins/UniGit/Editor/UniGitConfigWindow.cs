@@ -1,3 +1,5 @@
+using System.IO;
+using System.Net;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,10 +9,15 @@ public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
     private string userName;
     private string userEmail;
     private string originUrl;
+
+    private bool hasGitIgnoreFileInRoot = false;
+    
+    private string RootGitIgnoreFilePath => Path.Combine(Application.dataPath, "..", ".gitignore");
     
     [MenuItem("Tools/UniGit/UniGit Config")]
     public static void Init() {
-        var wnd = GetWindowWithRect<UniGitConfigWindow>(new Rect(0, 0, 527, 155));
+        // var wnd = GetWindowWithRect<UniGitConfigWindow>(new Rect(0, 0, 527, 155));
+        var wnd = GetWindow<UniGitConfigWindow>();
         
         wnd.titleContent = new GUIContent("UniGit Config");
     }
@@ -27,6 +34,13 @@ public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
     }
 
     private void OnGUI() {
+
+        if (!hasGitIgnoreFileInRoot) {
+            EditorGUILayout.HelpBox(".gitignore file not found", MessageType.Warning);
+        }
+        
+        GUILayout.Space(10);
+        
         GUILayout.Label("Git config:", EditorStyles.boldLabel);
 
         if(GitConfig.gitStatusCode != 0)
@@ -62,8 +76,11 @@ public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
             SaveGitChanges();
         }
         GUI.enabled = true;
-        if (GUILayout.Button("Testux")) {
-            Debug.Log(Application.dataPath);
+        
+        
+        GUILayout.Space(5);
+        if (GUILayout.Button("Generate .gitignore")) {
+            GenerateGitIgnore();
         }
     }
     
@@ -73,6 +90,9 @@ public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
         userName = GitConfig.userName;
         userEmail = GitConfig.userEmail;
         originUrl = GitConfig.originUrl;
+
+        hasGitIgnoreFileInRoot = File.Exists(RootGitIgnoreFilePath);
+        Debug.Log("hasGitIgnoreFileInRoot: "+hasGitIgnoreFileInRoot);
     }
 
     private void SaveGitChanges() {
@@ -114,5 +134,28 @@ public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
                 GitConfig.originUrl = originUrl;
             }
         }
+    }
+
+    private void GenerateGitIgnore() {
+        var url = "https://raw.githubusercontent.com/github/gitignore/main/Unity.gitignore";
+
+        var request = WebRequest.Create(url);
+        request.Method = "GET";
+
+        var webResponse = request.GetResponse();
+        var webStream = webResponse.GetResponseStream();
+
+        var reader = new StreamReader(webStream);
+        string data = reader.ReadToEnd();
+
+        data += "\n##### UNIGIT CUSTOM #####" +
+                "\n.idea";
+        
+        
+        File.WriteAllText(RootGitIgnoreFilePath, data);
+        Debug.Log($"<color=green>.gitignore file generated at: {RootGitIgnoreFilePath}</color>");
+
+        hasGitIgnoreFileInRoot = true;
+        Repaint();
     }
 }

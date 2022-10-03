@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -309,8 +308,6 @@ public static class UniGit {
             if(guid != EMPTY_GUI)   // Register guid if is valid
                 pathsGuidRegistered.Add(guid);
         }
-
-        Debug.Log(pathsRegistered);
     }
 
     private static (string status, Color statusColor, StatusType statusType) GetLabelWithColorByStatus(char status) {

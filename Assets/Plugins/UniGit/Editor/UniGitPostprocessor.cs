@@ -9,8 +9,6 @@ public class UniGitPostprocessor : AssetPostprocessor {
 			return;
 		}
 
-		
-		
 		foreach (string str in importedAssets) {
 			if(str.EndsWith(".cs"))	// If is a c# file then the UniGit constructor on domain reload will refresh the data
 				return;
@@ -33,5 +31,10 @@ public class UniGitPostprocessor : AssetPostprocessor {
 		}
 
 		UniGit.RefreshFilesStatus();
+
+		// Refresh window
+		if (EditorWindow.HasOpenInstances<UniGitWindow>()) {
+			EditorWindow.GetWindow<UniGitWindow>().DrawWindow(false);
+		}
 	}
 }

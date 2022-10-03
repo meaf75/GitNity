@@ -21,9 +21,9 @@ Here is a list of commands used to populate window data or execute some git oper
     git clean -f -q -- "PATH"
     ```
 
-- Diff file79p¡0
+- Diff file
     ``` sh
-    git diff -U$(wc -l Assets/Plugins/UniGit/Editor/UniGit.cs)
+    git diff --word-diff=porcelain -U9999 FILE_PATH
     ```
 
 - Get commits
@@ -77,3 +77,7 @@ Here is a list of commands used to populate window data or execute some git oper
     ``` sh
     git branch BRANCH_NAME FROM_BRANCH_NAME
     ```
+  
+- List changes
+    ``` sh
+    git status -u -s

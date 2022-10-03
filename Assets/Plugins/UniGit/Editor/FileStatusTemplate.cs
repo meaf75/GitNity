@@ -118,13 +118,21 @@ public static class FileStatusTemplate {
 
 	    int idx = bindProperties.Idx;
 	    
-	    void OnClickShowInExplorer(DropdownMenuAction dropdownMenuAction) {
+	    void OnClickShowInExplorer(DropdownMenuAction _) {
 		    bindProperties.OnClickShowInExplorer.Invoke(idx);
+	    }
+	    
+	    void OpenDiffWindowForFile(DropdownMenuAction _) {
+		    var windowDiff = ScriptableObject.CreateInstance<UniGitDiffWindow>();
+		    windowDiff.OpenForFile(UniGit.filesStatus[idx]);
+		    
+		    windowDiff.Show();
 	    }
 	    
 	    // Add a single menu item
 	    void MenuBuilder(ContextualMenuPopulateEvent evtMenu) {
 		    evtMenu.menu.AppendAction("Show in explorer", OnClickShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("View changes", OpenDiffWindowForFile, (a) => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Ping file", bindProperties.OnClickPingFile,_ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Revert", bindProperties.OnClickRevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), (a) => DropdownMenuAction.Status.Normal, idx);
