@@ -278,6 +278,7 @@ public class TabGitChangesTemplate {
 	}
 
 	private static void RefreshTemplate() {
+		UniGit.RefreshFilesStatus();
 		LoadData();
 		listViewContainer.itemsSource = UniGit.filesStatus;
 		listViewContainer.RefreshItems();
