@@ -1,0 +1,41 @@
+.container {
+    flex-direction: row;
+}
+
+.label-description {
+    flex-grow: 1;
+    border-left-width: 1px;
+    padding-left: 5px;
+    margin-left: 5px;
+    overflow: hidden;
+    min-height: auto;
+    min-width: 20px;
+    width: 87px;
+    border-left-color: rgba(115, 115, 115, 255);
+}
+
+.label-date {
+    border-left-width: 1px;
+    margin-left: 5px;
+    padding-left: 5px;
+    overflow: hidden;
+    flex-grow: 1;
+    max-width: 135px;
+    width: 79px;
+    border-left-color: rgba(115, 115, 115, 255);
+}
+
+.label-commit-hash {
+    margin-left: 5px;
+    padding-left: 5px;
+    border-left-width: 1px;
+    flex-grow: 1;
+    max-width: 65px;
+    width: 56px;
+    border-left-color: rgba(115, 115, 115, 255);
+    -unity-text-align: upper-center;
+}
+
+.label-owner {
+    width: 70px;
+}

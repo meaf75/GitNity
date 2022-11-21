@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Plugins.UniGit.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -47,6 +48,8 @@ public static class FileStatusTemplate {
 	    return element;
     }
 
+    /// <summary> Set corresponding values for given visual element </summary>
+    /// <param name="bindProperties">element of the ListView</param>
     public static void BindItem(BindProperties bindProperties) {
 	    if (registeredElements == null)
 		    registeredElements = new Dictionary<VisualElement, EventCallback<ChangeEvent<bool>>>();
@@ -108,23 +111,34 @@ public static class FileStatusTemplate {
 
     private static VisualTreeAsset GetTemplate() {
 	    if(!template)
-			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/FileStatusItem.uxml");
+			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
 
 	    return template;
     }
     
      
+    /// <summary> Open context menu </summary>
+    /// <param name="bindProperties"></param>
     private static void HandleRightClick(BindProperties bindProperties) {
 
 	    int idx = bindProperties.Idx;
 	    
-	    void OnClickShowInExplorer(DropdownMenuAction dropdownMenuAction) {
+	    void OnClickShowInExplorer(DropdownMenuAction _) {
 		    bindProperties.OnClickShowInExplorer.Invoke(idx);
+	    }
+	    
+	    void OpenDiffWindowForFile(DropdownMenuAction _) {
+		    var windowDiff = ScriptableObject.CreateInstance<UniGitDiffWindow>();
+		    windowDiff.titleContent = new GUIContent($"Viewing {UniGit.filesStatus[idx].path}");
+		    windowDiff.OpenForFile(UniGit.filesStatus[idx]);
+		    
+		    windowDiff.Show();
 	    }
 	    
 	    // Add a single menu item
 	    void MenuBuilder(ContextualMenuPopulateEvent evtMenu) {
 		    evtMenu.menu.AppendAction("Show in explorer", OnClickShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
+		    evtMenu.menu.AppendAction("View changes", OpenDiffWindowForFile, (a) => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Ping file", bindProperties.OnClickPingFile,_ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Revert", bindProperties.OnClickRevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
 		    evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), (a) => DropdownMenuAction.Status.Normal, idx);

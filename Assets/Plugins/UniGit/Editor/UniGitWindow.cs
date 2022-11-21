@@ -1,128 +1,154 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Plugins.UniGit.Editor.Tabs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Cursor = UnityEngine.Cursor;
 using Debug = UnityEngine.Debug;
 
 // Icons from https://icons8.com/
-public class UniGitWindow : EditorWindow, IHasCustomMenu {
-	public static class Classes {
-		public const string SelectedTabClass = "selected-tab";
-		public const string DisplayNoneClass = "display-none";
-		public const string FullHeightClass = "full-height";
-	}
-
-	// Icons: https://github.com/halak/unity-editor-icons
-
-	private static UniGitWindow window;
-
-	
-	private int currentTab = 0;
-	
-	[MenuItem("Tools/UniGit/UniGit window")]
-	static void Init(){
-		window = GetWindow<UniGitWindow>(typeof(UniGitWindow));
-
-		// Loads an icon from an image stored at the specified path
-		Texture icon = AssetDatabase.LoadAssetAtPath<Texture> ($"{UniGit.GetPluginPath(window)}/Icons/icons8-git-48.png");
-		// Create the instance of GUIContent to assign to the window. Gives the title "RBSettings" and the icon
-		GUIContent titleContent = new GUIContent ("UniGit", icon);
-		
-		window.titleContent = titleContent;
-		window.minSize = new Vector2(372, 286);
-	}
-	
-	private void CreateGUI() {
-	}
-
-	private void OnEnable() {
-		DrawWindow(true);
-	}
-
-	void IHasCustomMenu.AddItemsToMenu(GenericMenu menu){
-		GUIContent content = new GUIContent("Reload");
-		menu.AddItem(content, false, () => DrawWindow(true));
-	}
-
-	private void DrawWindow(bool requireLoadData) {
-		if(requireLoadData)
-			UniGit.LoadData(this);
-		
-		VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
-		var TemplateContainer = uiAsset.Instantiate();
-		TemplateContainer.AddToClassList(Classes.FullHeightClass);
-		
-		rootVisualElement.Clear();
-		rootVisualElement.Add(TemplateContainer);
-		
-		UniGitWindowTemplate.RegisterElements(rootVisualElement);
-		
-		// Setup callbacks
-		foreach (var tab in UniGitWindowTemplate.tabs) {
-			tab.RegisterCallback<ClickEvent>(OnPressTab);
-		}
-		
-		// Header
-		UniGitWindowTemplate.labelBranch.text = UniGit.currentBranch;
-		UniGit.currentBranchOptionIdx = UniGit.branches.IndexOf(UniGit.currentBranch);
-		UniGitWindowTemplate.dropdownBranches.index = UniGit.currentBranchOptionIdx;
-		UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
-		UniGitWindowTemplate.dropdownBranches.choices = UniGit.branches;
-		UniGitWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
-		UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => DrawWindow(true));
-		
-		LoadTab(0);
-	}
-	
-	private void OnPressTab(ClickEvent evt) {
-		if (currentTab == ((Button) evt.currentTarget).tabIndex) {
-			return;
-		}
-		
-		UniGitWindowTemplate.tabs[currentTab].RemoveFromClassList(Classes.SelectedTabClass);
-
-		currentTab = ((Button) evt.currentTarget).tabIndex;
-		UniGitWindowTemplate.tabs[currentTab].AddToClassList(Classes.SelectedTabClass);
-
-		LoadTab(currentTab);
-	}
-
-	private void LoadTab(int tabIdx) {
-
-		if (tabIdx is 1 or 2) {
-			Debug.Log("not implemented");
-			return;
+namespace Plugins.UniGit.Editor
+{
+	public class UniGitWindow : EditorWindow, IHasCustomMenu {
+		public static class Classes {
+			public const string SelectedTabClass = "selected-tab";
+			public const string DisplayNoneClass = "display-none";
+			public const string FullHeightClass = "full-height";
 		}
 
-		VisualElement TabContent;
-		UniGitWindowTemplate.tabContent.Clear();
-		
-		if (tabIdx == 0) {
-			TabContent = TabGitChangesTemplate.RenderTemplate(this,UniGitWindowTemplate.tabContent);
-		} else {
-			Debug.LogWarning("Unknown tab");
-			return;
-		}
-		
-		TabContent.AddToClassList(Classes.FullHeightClass);
-	}
-	
-	private void OnChangeDropdownOptionValue(ChangeEvent<string> evt) {
+		// Icons: https://github.com/halak/unity-editor-icons
 
-		if (UniGitWindowTemplate.dropdownBranches.index == UniGit.newBranchOptionIdx) {
-			Debug.Log("Creating new branch");
+		private static UniGitWindow window;
+
+		private int currentTab = 0;
+	
+		[MenuItem("Tools/UniGit/UniGit window")]
+		static void Init(){
+			window = GetWindow<UniGitWindow>(typeof(UniGitWindow));
+
+			// Loads an icon from an image stored at the specified path
+			Texture icon = AssetDatabase.LoadAssetAtPath<Texture> ($"{UniGit.GetPluginPath(window)}/Icons/icons8-git-48.png");
+			// Create the instance of GUIContent to assign to the window. Gives the title "RBSettings" and the icon
+			GUIContent titleContent = new GUIContent ("UniGit", icon);
+		
+			window.titleContent = titleContent;
+			window.minSize = new Vector2(640, 286);
+		}
+	
+		private void OnEnable() {
+			DrawWindow(true);
+		}
+
+		void IHasCustomMenu.AddItemsToMenu(GenericMenu menu){
+			GUIContent content = new GUIContent("Reload");
+			menu.AddItem(content, false, () => DrawWindow(true));
+		}
+
+		/// <summary> Render window with corresponding tab </summary>
+		/// <param name="reloadLoadData">Refresh data required to render this window?</param>
+		public void DrawWindow(bool reloadLoadData) {
+		
+			if(!UniGit.isGitRepository)	// Do not render window and draw warnings in the OnGui Method
+				return;
+		
+			if (reloadLoadData) {
+				UniGit.LoadData(this);
+			}
+		
+			VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/UniGitWindow.uxml");
+			var TemplateContainer = uiAsset.Instantiate();
+			TemplateContainer.AddToClassList(Classes.FullHeightClass);
+		
+			rootVisualElement.Clear();
+			rootVisualElement.Add(TemplateContainer);
+		
+			UniGitWindowTemplate.RegisterElements(rootVisualElement);
+		
+			// Setup callbacks
+			foreach (var tab in UniGitWindowTemplate.tabs) {
+				tab.RegisterCallback<ClickEvent>(OnPressTab);
+			}
+		
+			// Header
+			UniGitWindowTemplate.labelBranch.text = UniGit.currentBranchName;
+			UniGit.currentBranchOptionIdx = UniGit.branches.IndexOf(UniGit.currentBranchName);
+			UniGitWindowTemplate.dropdownBranches.index = UniGit.currentBranchOptionIdx;
 			UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
-			return;
+			UniGitWindowTemplate.dropdownBranches.choices = UniGit.branches;
+			UniGitWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
+			UniGitWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => {
+				UniGit.RefreshFilesStatus();
+				DrawWindow(true);
+				Debug.Log("Data refreshed");
+			});
+		
+			LoadTab(currentTab);
 		}
 
-		UniGit.currentBranchOptionIdx = UniGitWindowTemplate.dropdownBranches.index;
-		Debug.Log("Selected: "+UniGitWindowTemplate.dropdownBranches.index);
-	}
+		private void OnGUI() {
+			if (!UniGit.isGitRepository) {
+				EditorGUILayout.HelpBox("Current project seems to not be a git repository", MessageType.Warning);
+
+				if (GUILayout.Button("Initialize repository")) {
+					UniGitConfigWindow.Init();	
+				}
+			}
+		}
+
+		private void OnPressTab(ClickEvent evt) {
+			if (currentTab == ((Button) evt.currentTarget).tabIndex) {
+				return;
+			}
+		
+			UniGitWindowTemplate.tabs[currentTab].RemoveFromClassList(Classes.SelectedTabClass);
+
+			currentTab = ((Button) evt.currentTarget).tabIndex;
+			UniGitWindowTemplate.tabs[currentTab].AddToClassList(Classes.SelectedTabClass);
+
+			LoadTab(currentTab);
+		}
+
+		/// <summary> Load selected tab (changes/commits) </summary>
+		/// <param name="tabIdx">idx of the tab</param>
+		private void LoadTab(int tabIdx) {
+			VisualElement TabContent;
+			UniGitWindowTemplate.tabContent.Clear();
+		
+			if (tabIdx == 0) {
+				TabContent = TabGitChangesTemplate.RenderTemplate(this,UniGitWindowTemplate.tabContent);
+			} else {
+				TabContent = TabGitCommits.RenderTemplate(this,UniGitWindowTemplate.tabContent);
+			}
+		
+			TabContent.AddToClassList(Classes.FullHeightClass);
+		}
 	
+		/// <summary> Bound to the branches drop down </summary>
+		private void OnChangeDropdownOptionValue(ChangeEvent<string> evt) {
+
+			if (UniGitWindowTemplate.dropdownBranches.index == UniGit.currentBranchOptionIdx) {
+				return;
+			}
+		
+			// For create branch
+			if (UniGitWindowTemplate.dropdownBranches.index == UniGit.newBranchOptionIdx) {
+				CreateBranchWindow.OpenPopUp(UniGit.currentBranchName, UniGit.branches);
+				UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
+				return;
+			}
+
+			// For switch into a branch
+			bool switched = UniGit.SwitchToBranch(UniGitWindowTemplate.dropdownBranches.index);
+
+			if (!switched) {
+				EditorUtility.DisplayDialog("Error switching branch",
+					$"An error ocurred trying to change into the {UniGit.branches[UniGitWindowTemplate.dropdownBranches.index]} branch, please check the warning logs",
+					"ok");
+			
+				UniGitWindowTemplate.dropdownBranches.SetValueWithoutNotify(UniGit.branches[UniGit.currentBranchOptionIdx]);
+				return;
+			}
+		
+			UniGit.currentBranchOptionIdx = UniGitWindowTemplate.dropdownBranches.index;
+		}
+	
+	}
 }
