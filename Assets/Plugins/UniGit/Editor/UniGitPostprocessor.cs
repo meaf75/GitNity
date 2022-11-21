@@ -1,7 +1,9 @@
+using Plugins.UniGit.Editor;
 using UnityEditor;
 using UnityEngine;
 
 public class UniGitPostprocessor : AssetPostprocessor {
+	/// <summary>Called from unity</summary>
 	static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload) {
 	
 		if (didDomainReload) {
@@ -29,6 +31,9 @@ public class UniGitPostprocessor : AssetPostprocessor {
 			
 			Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
 		}
+
+		if(!UniGit.HasGitCommandLineInstalled())
+			return;
 
 		UniGit.RefreshFilesStatus();
 

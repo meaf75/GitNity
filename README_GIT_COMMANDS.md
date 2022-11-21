@@ -81,3 +81,7 @@ Here is a list of commands used to populate window data or execute some git oper
 - List changes
     ``` sh
     git status -u -s
+
+- Set path for private ssh path
+    ``` sh
+    git config core.sshCommand "ssh -i PRIVATE_SSH_KEY_PATH"

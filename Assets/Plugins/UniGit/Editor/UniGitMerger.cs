@@ -2,10 +2,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
+/// <summary>
+/// TODO: should I make a merger or just open the asset with the user script editor?
+/// </summary>
 public class UniGitMerger : EditorWindow
 {
-    [MenuItem("Window/UI Toolkit/UniGitMerger")]
+    // [MenuItem("Tools/UniGit/UniGit window")]
     public static void ShowExample()
     {
         UniGitMerger wnd = GetWindow<UniGitMerger>();

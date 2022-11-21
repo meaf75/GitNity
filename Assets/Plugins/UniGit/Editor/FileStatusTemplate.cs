@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Plugins.UniGit.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -47,6 +48,8 @@ public static class FileStatusTemplate {
 	    return element;
     }
 
+    /// <summary> Set corresponding values for given visual element </summary>
+    /// <param name="bindProperties">element of the ListView</param>
     public static void BindItem(BindProperties bindProperties) {
 	    if (registeredElements == null)
 		    registeredElements = new Dictionary<VisualElement, EventCallback<ChangeEvent<bool>>>();
@@ -114,6 +117,8 @@ public static class FileStatusTemplate {
     }
     
      
+    /// <summary> Open context menu </summary>
+    /// <param name="bindProperties"></param>
     private static void HandleRightClick(BindProperties bindProperties) {
 
 	    int idx = bindProperties.Idx;
@@ -124,6 +129,7 @@ public static class FileStatusTemplate {
 	    
 	    void OpenDiffWindowForFile(DropdownMenuAction _) {
 		    var windowDiff = ScriptableObject.CreateInstance<UniGitDiffWindow>();
+		    windowDiff.titleContent = new GUIContent($"Viewing {UniGit.filesStatus[idx].path}");
 		    windowDiff.OpenForFile(UniGit.filesStatus[idx]);
 		    
 		    windowDiff.Show();
