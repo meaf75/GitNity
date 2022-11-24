@@ -72,6 +72,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-##### UNIGIT CUSTOM #####
+##### GitNity CUSTOM #####
 .idea
 node_modules

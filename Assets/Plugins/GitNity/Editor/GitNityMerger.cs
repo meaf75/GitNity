@@ -5,13 +5,13 @@ using UnityEngine.UIElements;
 /// <summary>
 /// TODO: should I make a merger or just open the asset with the user script editor?
 /// </summary>
-public class UniGitMerger : EditorWindow
+public class GitNityMerger : EditorWindow
 {
-    // [MenuItem("Tools/UniGit/UniGit window")]
+    // [MenuItem("Tools/GitNity/GitNity window")]
     public static void ShowExample()
     {
-        UniGitMerger wnd = GetWindow<UniGitMerger>();
-        wnd.titleContent = new GUIContent("UniGitMerger");
+        GitNityMerger wnd = GetWindow<GitNityMerger>();
+        wnd.titleContent = new GUIContent("GitNityMerger");
     }
 
     public void CreateGUI()
@@ -24,7 +24,7 @@ public class UniGitMerger : EditorWindow
         root.Add(label);
 
         // Import UXML
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/UniGit/Editor/UniGitMerger.uxml");
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/GitNity/Editor/GitNityMerger.uxml");
         VisualElement labelFromUXML = visualTree.Instantiate();
         root.Add(labelFromUXML);
     }

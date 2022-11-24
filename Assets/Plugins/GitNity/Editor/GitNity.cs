@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Plugins.UniGit.Editor
+namespace Plugins.GitNity.Editor
 {
     /// <summary> Short Git track status </summary>
     public enum StatusType {
@@ -25,7 +25,7 @@ namespace Plugins.UniGit.Editor
     /// <summary> Contain each git tracked file resume </summary>
     public struct GitFileStatus {
         public bool isMergeError;
-        /// <summary> Is this file selected on the UniGit window list? </summary>
+        /// <summary> Is this file selected on the GitNity window list? </summary>
         public bool isSelected;
         /// <summary> Long name for the status of the file </summary>
         public string statusName;
@@ -41,7 +41,7 @@ namespace Plugins.UniGit.Editor
 
     /// <summary> Class in charge of all git operations </summary>
     [InitializeOnLoad]
-    public static class UniGit {
+    public static class GitNity {
 
         private const string EMPTY_GUI = "00000000000000000000000000000000";
     
@@ -92,7 +92,7 @@ namespace Plugins.UniGit.Editor
         };
 
         /// <summary> Initialize the plugin </summary>
-        static UniGit() {
+        static GitNity() {
             pathsRegistered = new List<string>();
             pathsGuidRegistered = new List<string>();
 
@@ -142,8 +142,8 @@ namespace Plugins.UniGit.Editor
         }
     
         /// <summary> Pull & parse all the data from basic git command like all branches or current branch </summary>
-        /// <param name="window">The UniGit window editor to get the plugin installation path </param>
-        public static void LoadData(UniGitWindow window) {
+        /// <param name="window">The GitNity window editor to get the plugin installation path </param>
+        public static void LoadData(GitNityWindow window) {
             pluginPath = GetPluginPath(window);
         
             // Get use current branch
@@ -176,7 +176,7 @@ namespace Plugins.UniGit.Editor
             }
         }
 
-        /// <summary> Cache and parse a "git status" command to build the UniGit info to be used by the main window  </summary>
+        /// <summary> Cache and parse a "git status" command to build the GitNity info to be used by the main window  </summary>
         public static void RefreshFilesStatus() {
             // Get files with status
             var statusExec = ExecuteProcessTerminal2("status -u -s", "git");
@@ -210,7 +210,7 @@ namespace Plugins.UniGit.Editor
         }
 
         /// <summary> Hacky method to get the plugin installation path based on an Editor window </summary>
-        /// <param name="target">Any UniGit Editor window</param>
+        /// <param name="target">Any GitNity Editor window</param>
         /// <returns>Path of the plugin</returns>
         public static string GetPluginPath(EditorWindow target) {
             var script = MonoScript.FromScriptableObject(target);
@@ -555,7 +555,7 @@ namespace Plugins.UniGit.Editor
             try {
                 ExecuteProcessTerminal2("", "git");
             } catch(Exception e) {
-                Debug.LogError($"\"git\" was not detected on the system path, please install it before use UniGit, https://git-scm.com/download \n{e.Message}");
+                Debug.LogError($"\"git\" was not detected on the system path, please install it before use GitNity, https://git-scm.com/download \n{e.Message}");
                 return false;
             }
 

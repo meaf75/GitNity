@@ -22,13 +22,13 @@ public class DiffLineTemplate : EditorWindow
         root.Add(label);
 
         // Import UXML
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/UniGit/Editor/DiffLineTemplate.uxml");
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/GitNity/Editor/DiffLineTemplate.uxml");
         VisualElement labelFromUXML = visualTree.Instantiate();
         root.Add(labelFromUXML);
 
         // A stylesheet can be added to a VisualElement.
         // The style will be applied to the VisualElement and all of its children.
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Plugins/UniGit/Editor/DiffLineTemplate.uss");
+        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Plugins/GitNity/Editor/DiffLineTemplate.uss");
         VisualElement labelWithStyle = new Label("Hello World! With Style");
         labelWithStyle.styleSheets.Add(styleSheet);
         root.Add(labelWithStyle);

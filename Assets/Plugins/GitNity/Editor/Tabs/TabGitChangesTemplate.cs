@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.UniGit.Editor.Tabs
+namespace Plugins.GitNity.Editor.Tabs
 {
 	public static class TabGitChangesTemplate {
 
@@ -29,12 +29,12 @@ namespace Plugins.UniGit.Editor.Tabs
 		private static List<string> nonPushedCommits;
 
 		/// <summary> Add Visual element to given container </summary>
-		/// <param name="uniGitWindow">parent window</param>
+		/// <param name="gitNityWindow">parent window</param>
 		/// <param name="container">where to add this visual element</param>
 		/// <returns></returns>
-		public static VisualElement RenderTemplate(UniGitWindow uniGitWindow, VisualElement container) {
+		public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container) {
 			var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-				$"{UniGit.GetPluginPath(uniGitWindow)}/Templates/TabGitChanges.uxml");
+				$"{GitNity.GetPluginPath(gitNityWindow)}/Templates/TabGitChanges.uxml");
 			var template = UIAsset.Instantiate();
 			container.Add(template);
 
@@ -50,7 +50,7 @@ namespace Plugins.UniGit.Editor.Tabs
 		/// <summary> Load required data to render this visual element </summary>
 		private static void LoadData() {
 			// Commits behind
-			var statusBranchExec = UniGit.ExecuteProcessTerminal( $"status -b --porcelain=v2", "git");
+			var statusBranchExec = GitNity.ExecuteProcessTerminal( $"status -b --porcelain=v2", "git");
 			var statusOutputLines = statusBranchExec.result.Split("\n");
 
 			foreach (var statusOutputLine in statusOutputLines) {
@@ -66,7 +66,7 @@ namespace Plugins.UniGit.Editor.Tabs
 			}
 		
 			// Get non pushed commits
-			var nonPushedCommitsExec = UniGit.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
+			var nonPushedCommitsExec = GitNity.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
 			var localCommits = nonPushedCommitsExec.result.Split("\n");
             
 			// Fill non pushed commits
@@ -118,11 +118,11 @@ namespace Plugins.UniGit.Editor.Tabs
 				FileStatusTemplate.BindProperties properties;
 			
 				void Callback(ChangeEvent<bool> evt) => OnClickFileToggle(i);
-				void OnClickResolve(int idx) => OnClickResolveMergeError(UniGit.filesStatus[idx]);
+				void OnClickResolve(int idx) => OnClickResolveMergeError(GitNity.filesStatus[idx]);
 			
 				properties.Target = e;
 				properties.Idx = i;
-				properties.gitFileStatus = UniGit.filesStatus[i];
+				properties.gitFileStatus = GitNity.filesStatus[i];
 				properties.OnClickToogleFile = Callback; 
 				properties.OnClickShowInExplorer = ShowInExplorer; 
 				properties.OnClickPingFile = PingFile; 
@@ -131,7 +131,7 @@ namespace Plugins.UniGit.Editor.Tabs
 			
 				FileStatusTemplate.BindItem(properties);
 			};
-			listViewContainer.itemsSource = UniGit.filesStatus;
+			listViewContainer.itemsSource = GitNity.filesStatus;
 		
 			RefreshPullButton();
 		}
@@ -158,7 +158,7 @@ namespace Plugins.UniGit.Editor.Tabs
 			if(evt.keyCode != KeyCode.Space || isFocusedTextField || selectedIndices.Length == 0)
 				return;
 			
-			var filesStatus = UniGit.filesStatus;
+			var filesStatus = GitNity.filesStatus;
 
 			if (selectedIndices.Count() > 1) {
 
@@ -196,7 +196,7 @@ namespace Plugins.UniGit.Editor.Tabs
 	
 		/// <summary> Refresh visual elements data </summary>
 		private static void UpdateElementsBySelections() {
-			var filesStatus = UniGit.filesStatus;
+			var filesStatus = GitNity.filesStatus;
 			int selectedCount = filesStatus.FindAll(f => f.isSelected).Count;
 			int totalCount = filesStatus.Count;
 
@@ -207,12 +207,12 @@ namespace Plugins.UniGit.Editor.Tabs
 			buttonCommitSelected.SetEnabled(selectedCount > 0);
 
 			// Hide/Display button push
-			if (buttonPushCommits.ClassListContains(UniGitWindow.Classes.DisplayNoneClass)) {
-				buttonPushCommits.RemoveFromClassList(UniGitWindow.Classes.DisplayNoneClass);
+			if (buttonPushCommits.ClassListContains(GitNityWindow.Classes.DisplayNoneClass)) {
+				buttonPushCommits.RemoveFromClassList(GitNityWindow.Classes.DisplayNoneClass);
 			}
 
 			if (nonPushedCommits.Count == 0) {
-				buttonPushCommits.AddToClassList(UniGitWindow.Classes.DisplayNoneClass);
+				buttonPushCommits.AddToClassList(GitNityWindow.Classes.DisplayNoneClass);
 			} else {
 				buttonPushCommits.text = $"Push commits ({nonPushedCommits.Count})";
 				buttonPushCommits.tooltip = $"You have {nonPushedCommits.Count} commits without push";
@@ -222,7 +222,7 @@ namespace Plugins.UniGit.Editor.Tabs
 		/// <summary> Select items of the list </summary>
 		/// <param name="select"></param>
 		private static void SelectAllListElements(bool select) {
-			var filesStatus = UniGit.filesStatus;
+			var filesStatus = GitNity.filesStatus;
 			for (var i = 0; i < filesStatus.Count; i++) {
 				var fileStatus = filesStatus[i];
 				fileStatus.isSelected = select;
@@ -242,8 +242,8 @@ namespace Plugins.UniGit.Editor.Tabs
 
 			// Check if current branch has upstream branch
 			var exec =
-				UniGit.ExecuteProcessTerminal(
-					$"pull {UniGit.ORIGIN_NAME} {UniGit.currentBranchName} --allow-unrelated-histories", "git");
+				GitNity.ExecuteProcessTerminal(
+					$"pull {GitNity.ORIGIN_NAME} {GitNity.currentBranchName} --allow-unrelated-histories", "git");
 
 			if (exec.status != 0) {
 				Debug.LogWarning("Pull changes throw: "+exec.result);
@@ -258,13 +258,13 @@ namespace Plugins.UniGit.Editor.Tabs
 		/// <summary> Fetch changes from the remote repository </summary>
 		private static void OnPressFetch() {
 			Debug.Log("Fetching all");
-			var output = UniGit.ExecuteProcessTerminal("fetch --all", "git");
+			var output = GitNity.ExecuteProcessTerminal("fetch --all", "git");
 			Debug.Log("Fetch output: " + output.result);
 		}
 
 		/// <summary> Commit staged changes </summary>
 		private static void OnPressCommitSelected() {
-			var filesSelected = UniGit.filesStatus.FindAll(f => f.isSelected).ToArray();
+			var filesSelected = GitNity.filesStatus.FindAll(f => f.isSelected).ToArray();
 			var filesPath = new string[filesSelected.Length];
 
 			for (int i = 0; i < filesSelected.Length; i++) {
@@ -272,13 +272,13 @@ namespace Plugins.UniGit.Editor.Tabs
 			}
 
 			// Stage files
-			bool added = UniGit.AddFilesToStage(filesSelected);
+			bool added = GitNity.AddFilesToStage(filesSelected);
 
 			if (!added)
 				return;
 
 			// Commit
-			var commited = UniGit.CommitStagedFiles(textFieldCommit.value);
+			var commited = GitNity.CommitStagedFiles(textFieldCommit.value);
 
 			if (!commited)
 				return;
@@ -289,7 +289,7 @@ namespace Plugins.UniGit.Editor.Tabs
 
 		/// <summary> Push staged commits to the remote repository </summary>
 		private static void PushCommits() {
-			if (!UniGit.PushCommits())
+			if (!GitNity.PushCommits())
 				return;
 
 			RefreshTemplate();
@@ -297,9 +297,9 @@ namespace Plugins.UniGit.Editor.Tabs
 
 		/// <summary> Repaint template </summary>
 		private static void RefreshTemplate() {
-			UniGit.RefreshFilesStatus();
+			GitNity.RefreshFilesStatus();
 			LoadData();
-			listViewContainer.itemsSource = UniGit.filesStatus;
+			listViewContainer.itemsSource = GitNity.filesStatus;
 			listViewContainer.Rebuild();
 			UpdateElementsBySelections();
 			RefreshPullButton();
@@ -311,10 +311,10 @@ namespace Plugins.UniGit.Editor.Tabs
 		/// <summary> Toggle a file from the list </summary>
 		/// <param name="idx">idx of the file</param>
 		private static void OnClickFileToggle(int idx) {
-			var gitFileStatus = UniGit.filesStatus[idx];
+			var gitFileStatus = GitNity.filesStatus[idx];
 			gitFileStatus.isSelected = !gitFileStatus.isSelected;
 
-			UniGit.filesStatus[idx] = gitFileStatus;
+			GitNity.filesStatus[idx] = gitFileStatus;
 
 			listViewContainer.RefreshItem(idx);
 
@@ -329,9 +329,9 @@ namespace Plugins.UniGit.Editor.Tabs
 		}
 
 		/// <summary> Context menu, open selected file in the explorer </summary>
-		/// <param name="idx">Idx of the UniGit.filesStatus</param>
+		/// <param name="idx">Idx of the GitNity.filesStatus</param>
 		private static void ShowInExplorer(int idx) {
-			var fileStatus = UniGit.filesStatus[idx];
+			var fileStatus = GitNity.filesStatus[idx];
 
 			Debug.Log("Opening file at path: " + fileStatus.GetFullPath());
 			EditorUtility.RevealInFinder(fileStatus.path);
@@ -340,7 +340,7 @@ namespace Plugins.UniGit.Editor.Tabs
 		/// <summary> Focus file in the editor project window </summary>
 		private static void PingFile(DropdownMenuAction aStatus) {
 			var idx = (int) aStatus.userData;
-			var gitFileStatus = UniGit.filesStatus[idx];
+			var gitFileStatus = GitNity.filesStatus[idx];
 			EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
 		}
 
@@ -363,7 +363,7 @@ namespace Plugins.UniGit.Editor.Tabs
 			var files = new GitFileStatus[selectedIndices.Count];
 
 			for (var i = 0; i < selectedIndices.Count; i++) {
-				files[i] = UniGit.filesStatus[selectedIndices[i]];
+				files[i] = GitNity.filesStatus[selectedIndices[i]];
 			}
 
 			string msg =
@@ -373,7 +373,7 @@ namespace Plugins.UniGit.Editor.Tabs
 			if (!revert)
 				return;
 
-			if (UniGit.RevertFiles(files))
+			if (GitNity.RevertFiles(files))
 				RefreshTemplate();
 		}
 		#endregion
