@@ -3,7 +3,7 @@ using System.Net;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.UniGit.Editor
+namespace Plugins.GitNity.Editor
 {
     /// <summary> Config if the local repository </summary>
     public static class GitConfig {
@@ -14,11 +14,11 @@ namespace Plugins.UniGit.Editor
         public static string privateSshKeyPath;
     
         public static void LoadData() {
-            var usernameExec = UniGit.ExecuteProcessTerminal2("config user.name", "git");
-            var emailExec = UniGit.ExecuteProcessTerminal2("config user.email", "git");
+            var usernameExec = GitNity.ExecuteProcessTerminal2("config user.name", "git");
+            var emailExec = GitNity.ExecuteProcessTerminal2("config user.email", "git");
         
-            var originExec = UniGit.ExecuteProcessTerminal2($"config --get remote.{UniGit.ORIGIN_NAME}.url", "git");
-            var sshKeyPathExec = UniGit.ExecuteProcessTerminal2($"config core.sshCommand", "git");
+            var originExec = GitNity.ExecuteProcessTerminal2($"config --get remote.{GitNity.ORIGIN_NAME}.url", "git");
+            var sshKeyPathExec = GitNity.ExecuteProcessTerminal2($"config core.sshCommand", "git");
         
             userName = usernameExec.result.Split("\n")[0];
             userEmail = emailExec.result.Split("\n")[0];
@@ -34,7 +34,7 @@ namespace Plugins.UniGit.Editor
     }
     
     /// <summary> Window to facilitate the interaction with git </summary>
-    public class UniGitConfigWindow : EditorWindow, IHasCustomMenu {
+    public class GitNityConfigWindow : EditorWindow, IHasCustomMenu {
     
         private string userName;
         private string userEmail;
@@ -48,12 +48,12 @@ namespace Plugins.UniGit.Editor
 
         private string RootGitIgnoreFilePath => Path.Combine(Application.dataPath, "..", ".gitignore");
     
-        [MenuItem("Tools/UniGit/UniGit Config")]
+        [MenuItem("Tools/GitNity/GitNity Config")]
         public static void Init() {
-            // var wnd = GetWindowWithRect<UniGitConfigWindow>(new Rect(0, 0, 527, 155));
-            var wnd = GetWindow<UniGitConfigWindow>();
+            // var wnd = GetWindowWithRect<GitNityConfigWindow>(new Rect(0, 0, 527, 155));
+            var wnd = GetWindow<GitNityConfigWindow>();
         
-            wnd.titleContent = new GUIContent("UniGit Config");
+            wnd.titleContent = new GUIContent("GitNity Config");
         }
     
         // This interface implementation is automatically called by Unity.
@@ -75,7 +75,7 @@ namespace Plugins.UniGit.Editor
             bool warningsActive = false;
         
             if(!hasGitInstalled) {
-                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use UniGit, https://git-scm.com/download", MessageType.Error);
+                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use GitNity, https://git-scm.com/download", MessageType.Error);
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace Plugins.UniGit.Editor
             }
 
 
-            if (!UniGit.isGitRepository) {
+            if (!GitNity.isGitRepository) {
                 EditorGUILayout.HelpBox("Current project seems to not be a git repository", MessageType.Warning);
                 warningsActive = true;
             }
@@ -127,7 +127,7 @@ namespace Plugins.UniGit.Editor
         
             bool hasChanges = changedName || changedEmail || changedOrigin || changedSshKey;
 
-            if (!UniGit.isGitRepository) {
+            if (!GitNity.isGitRepository) {
                 GUILayout.Space(3);
             
                 if (GUILayout.Button("Initialize git repository")) {
@@ -155,14 +155,14 @@ namespace Plugins.UniGit.Editor
         /// <summary> Load user repository config </summary>
         private void LoadData() {
 
-            hasGitInstalled = UniGit.HasGitCommandLineInstalled();
+            hasGitInstalled = GitNity.HasGitCommandLineInstalled();
 
             if(!hasGitInstalled) {
                 return;
             }
 
 
-            UniGit.RefreshFilesStatus();
+            GitNity.RefreshFilesStatus();
             GitConfig.LoadData();
         
             userName = GitConfig.userName;
@@ -179,7 +179,7 @@ namespace Plugins.UniGit.Editor
             bool changesSaved = false;
         
             if (userName != GitConfig.userName) {
-                var cmdExec = UniGit.ExecuteProcessTerminal($"config user.name {userName}", "git");
+                var cmdExec = GitNity.ExecuteProcessTerminal($"config user.name {userName}", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Save username throw output: " + cmdExec.result);
@@ -191,7 +191,7 @@ namespace Plugins.UniGit.Editor
             }
 
             if (userEmail != GitConfig.userEmail) {
-                var cmdExec = UniGit.ExecuteProcessTerminal($"config user.email {userEmail}", "git");
+                var cmdExec = GitNity.ExecuteProcessTerminal($"config user.email {userEmail}", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Save email throw output: " + cmdExec.result);
@@ -204,7 +204,7 @@ namespace Plugins.UniGit.Editor
             
             if (privateSshKeyPath != GitConfig.privateSshKeyPath) {
                 privateSshKeyPath = privateSshKeyPath.Replace(@"\","/");
-                var cmdExec = UniGit.ExecuteProcessTerminal2($"config core.sshCommand \"ssh -i {privateSshKeyPath}\"", "git");
+                var cmdExec = GitNity.ExecuteProcessTerminal2($"config core.sshCommand \"ssh -i {privateSshKeyPath}\"", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Set ssh key path throw output: " + cmdExec.result);
@@ -219,9 +219,9 @@ namespace Plugins.UniGit.Editor
                 (string result, int status) cmdExec;
 
                 if (string.IsNullOrEmpty(GitConfig.originUrl)) {
-                    cmdExec = UniGit.ExecuteProcessTerminal($"remote add origin {originUrl}", "git");
+                    cmdExec = GitNity.ExecuteProcessTerminal($"remote add origin {originUrl}", "git");
                 } else {
-                    cmdExec = UniGit.ExecuteProcessTerminal($"remote set-url origin {originUrl}", "git");
+                    cmdExec = GitNity.ExecuteProcessTerminal($"remote set-url origin {originUrl}", "git");
                 }
 
                 if (cmdExec.status != 0) {
@@ -250,7 +250,7 @@ namespace Plugins.UniGit.Editor
             var reader = new StreamReader(webStream);
             string data = reader.ReadToEnd();
 
-            data += "\n##### UNIGIT CUSTOM #####" +
+            data += "\n##### GITNITY CUSTOM #####" +
                     "\n.idea";
         
         
@@ -263,7 +263,7 @@ namespace Plugins.UniGit.Editor
 
         /// <summary> Run a simple "git init" in the current unity project </summary>
         private void InitializeRepositoryFolder() {
-            var exec = UniGit.ExecuteProcessTerminal2("init", "git");
+            var exec = GitNity.ExecuteProcessTerminal2("init", "git");
 
             if (exec.status != 0) {
                 Debug.LogWarning("An error occured trying to initialize project as git repository");
@@ -272,7 +272,7 @@ namespace Plugins.UniGit.Editor
         
             Debug.Log($"<color=green>Project initialized as git repository</color>");
 
-            UniGit.isGitRepository = true;
+            GitNity.isGitRepository = true;
             LoadData();
             Repaint();
         }

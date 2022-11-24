@@ -4,9 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.UniGit.Editor
+namespace Plugins.GitNity.Editor
 {
-    public class UniGitDiffWindow : EditorWindow {
+    public class GitNityDiffWindow : EditorWindow {
 
         enum TextType {
             NONE, JUMPLINE, ADD, REMOVE        
@@ -41,7 +41,7 @@ namespace Plugins.UniGit.Editor
             rootVisualElement.Clear();
         
             // Import UXML template
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.GetPluginPath(this)}/Templates/UniGitDiffWindow.uxml");
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.GetPluginPath(this)}/Templates/GitNityDiffWindow.uxml");
             VisualElement labelFromUXML = visualTree.Instantiate();
             rootVisualElement.Add(labelFromUXML);
         
@@ -50,7 +50,7 @@ namespace Plugins.UniGit.Editor
             labelFileName.text = fileStatus.path;
 
             string filePath = fileStatus.GetFullPath();
-            var exec = UniGit.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
+            var exec = GitNity.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
         
             if (exec.status != 0) {
                 Debug.LogWarning("Git diff throw: "+exec.result);

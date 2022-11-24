@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Plugins.UniGit.Editor;
+using Plugins.GitNity.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -111,7 +111,7 @@ public static class FileStatusTemplate {
 
     private static VisualTreeAsset GetTemplate() {
 	    if(!template)
-			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
+			template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
 
 	    return template;
     }
@@ -128,9 +128,9 @@ public static class FileStatusTemplate {
 	    }
 	    
 	    void OpenDiffWindowForFile(DropdownMenuAction _) {
-		    var windowDiff = ScriptableObject.CreateInstance<UniGitDiffWindow>();
-		    windowDiff.titleContent = new GUIContent($"Viewing {UniGit.filesStatus[idx].path}");
-		    windowDiff.OpenForFile(UniGit.filesStatus[idx]);
+		    var windowDiff = ScriptableObject.CreateInstance<GitNityDiffWindow>();
+		    windowDiff.titleContent = new GUIContent($"Viewing {GitNity.filesStatus[idx].path}");
+		    windowDiff.OpenForFile(GitNity.filesStatus[idx]);
 		    
 		    windowDiff.Show();
 	    }

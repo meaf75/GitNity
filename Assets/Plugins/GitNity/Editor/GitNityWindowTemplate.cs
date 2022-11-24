@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-public static class UniGitWindowTemplate 
+public static class GitNityWindowTemplate 
 {
     public static Label labelBranch;
     public static VisualElement tabContent;

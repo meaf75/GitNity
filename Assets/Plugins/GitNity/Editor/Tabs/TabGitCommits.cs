@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Plugins.UniGit.Editor;
+using Plugins.GitNity.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class TabGitCommits : MonoBehaviour
 {
-    // UG prefix of UniGit
+    // UG prefix of GitNity
     public struct UGCommit {
         public string longCommitHash;
         public string shortCommitHash;
@@ -26,21 +26,21 @@ public class TabGitCommits : MonoBehaviour
     private static DropdownField dropdownBranches;
     
     /// <summary> Render Commits tab on given container </summary>
-    /// <param name="uniGitWindow">editor window</param>
-    /// <param name="container">UniGit window container</param>
+    /// <param name="gitNityWindow">editor window</param>
+    /// <param name="container">GitNity window container</param>
     /// <returns></returns>
-    public static VisualElement RenderTemplate(UniGitWindow uniGitWindow, VisualElement container) {
+    public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container) {
         var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-            $"{UniGit.GetPluginPath(uniGitWindow)}/Templates/TabCommits.uxml");
+            $"{GitNity.GetPluginPath(gitNityWindow)}/Templates/TabCommits.uxml");
         var Template = UIAsset.Instantiate();
         container.Add(Template);
 		
         RegisterElements(Template);
 
-        dropdownBranches.choices = UniGit.branches;
-        dropdownBranches.SetValueWithoutNotify(UniGit.currentBranchName);
+        dropdownBranches.choices = GitNity.branches;
+        dropdownBranches.SetValueWithoutNotify(GitNity.currentBranchName);
 
-        SetupTemplateElements(LoadData(UniGit.branches[UniGit.currentBranchOptionIdx]));
+        SetupTemplateElements(LoadData(GitNity.branches[GitNity.currentBranchOptionIdx]));
         
         return Template;
     }
@@ -54,7 +54,7 @@ public class TabGitCommits : MonoBehaviour
 
     /// <summary> Load required data to render this visual element </summary>
     private static Data LoadData(string branchName) {
-        var commitsExec = UniGit.ExecuteProcessTerminal( $"log --format=\"%H #UG# %h #UG# %an #UG# %ae #UG# %ai #UG# %s\" --max-count=301 --date-order {branchName} --", "git");
+        var commitsExec = GitNity.ExecuteProcessTerminal( $"log --format=\"%H #UG# %h #UG# %an #UG# %ae #UG# %ai #UG# %s\" --max-count=301 --date-order {branchName} --", "git");
 
         var commitsInfo = commitsExec.result.Split("\n");
 
@@ -80,9 +80,9 @@ public class TabGitCommits : MonoBehaviour
     /// <param name="data">Data used to draw this template</param>
     private static void SetupTemplateElements(Data data) {
         listViewCommits.fixedItemHeight = 16;
-        listViewCommits.makeItem = UniGitCommitTemplate.MakeItem;
+        listViewCommits.makeItem = GitNityCommitTemplate.MakeItem;
         listViewCommits.bindItem = (e, i) => {
-            UniGitCommitTemplate.BindItem(e, data.Commits[i]);
+            GitNityCommitTemplate.BindItem(e, data.Commits[i]);
         };
         listViewCommits.itemsSource = data.Commits;
         

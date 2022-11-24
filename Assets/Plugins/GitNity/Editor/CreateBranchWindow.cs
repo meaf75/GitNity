@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.UniGit.Editor
+namespace Plugins.GitNity.Editor
 {
     public class CreateBranchWindow : EditorWindow {
     
@@ -61,19 +61,19 @@ namespace Plugins.UniGit.Editor
         /// <summary> Run command and create new a branch </summary>
         private void OnClickCreate() {
             // Check if branch exist
-            if (UniGit.BranchExist(BranchName)) {
+            if (GitNity.BranchExist(BranchName)) {
                 EditorUtility.DisplayDialog("Error branch exist", $"Branch \"{BranchName}\" already exist", "Ok");
                 return;
             }
             
             // Create branch
-            var created = UniGit.CreateBranch(BranchName, Branches[SelectedFromBranchIdx], SwitchToBranch);
+            var created = GitNity.CreateBranch(BranchName, Branches[SelectedFromBranchIdx], SwitchToBranch);
             
             if(!created)
                 return;
          
-            var uniGitWindow = GetWindow<UniGitWindow>(typeof(UniGitWindow));
-            uniGitWindow.DrawWindow(true);  // Update parent 
+            var gitNityWindow = GetWindow<GitNityWindow>(typeof(GitNityWindow));
+            gitNityWindow.DrawWindow(true);  // Update parent 
             
             EditorUtility.DisplayDialog("Success", $"Branch \"{BranchName}\" created, switched: {SwitchToBranch}", "Ok");
             Close();

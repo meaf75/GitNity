@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace Plugins.UniGit.Editor
+namespace Plugins.GitNity.Editor
 {
-	public static class UniGitCommitTemplate
+	public static class GitNityCommitTemplate
 	{
 	
 		private struct Elements {
@@ -31,7 +31,7 @@ namespace Plugins.UniGit.Editor
 	
 		private static VisualTreeAsset GetTemplate() {
 			if(!template)
-				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{UniGit.pluginPath}/Templates/{nameof(UniGitCommitTemplate)}.uxml");
+				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.pluginPath}/Templates/{nameof(GitNityCommitTemplate)}.uxml");
 
 			return template;
 		}
