@@ -48,8 +48,8 @@ Git integration for Unity projects, all basic tools inside the editor
 ## From a git url
 You can install this plugin via assets manager from a git url
 
-![install-1](./.github/pm-gitnity.png)
-![install-2](./.github/pm-gitnity-2.png)
+![install-1](./.github/pm-gitnity.webp)
+![install-2](./.github/pm-gitnity-2.webp)
 
 More information at: https://docs.unity3d.com/Manual/upm-ui-giturl.html
 
