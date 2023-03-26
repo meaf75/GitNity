@@ -233,6 +233,10 @@ namespace Plugins.GitNity.Editor
             if (trackStatus.path.Contains("\""))    // Clear spaced paths 
                 trackStatus.path = trackStatus.path.Replace("\"","");
         
+	    if (trackStatus.path.Contains(" -> ")) {    // Handle renamed files
+                trackStatus.path = trackStatus.path.Split(" -> ")[1];
+            }
+	
             trackStatus.trackedPathStatus = fileStatusWithPath[..2];
 
             // Get file guid
