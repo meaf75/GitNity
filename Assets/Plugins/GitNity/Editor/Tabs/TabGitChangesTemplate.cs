@@ -28,11 +28,13 @@ namespace Plugins.GitNity.Editor.Tabs
 
 		private static List<string> nonPushedCommits;
 
-		/// <summary> Add Visual element to given container </summary>
-		/// <param name="gitNityWindow">parent window</param>
-		/// <param name="container">where to add this visual element</param>
-		/// <returns></returns>
-		public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container) {
+		private const string texfieldCommitId = "textfield-commit";
+
+        /// <summary> Add Visual element to given container </summary>
+        /// <param name="gitNityWindow">parent window</param>
+        /// <param name="container">where to add this visual element</param>
+        /// <returns></returns>
+        public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container) {
 			var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
 				$"{GitNity.GetPluginPath(gitNityWindow)}/Templates/TabGitChanges.uxml");
 			var template = UIAsset.Instantiate();
@@ -83,7 +85,7 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Query and set the elements of this Visual Element </summary>
 		/// <param name="root">container of the queried elements</param>
 		private static void RegisterElements(VisualElement root) {
-			textFieldCommit = root.Q<TextField>("textfield-commit");
+			textFieldCommit = root.Q<TextField>(texfieldCommitId);
 			labelSelectedCount = root.Q<Label>("label-selected-count");
 			buttonAll = root.Q<Button>("button-all");
 			buttonNone = root.Q<Button>("button-none");
@@ -202,8 +204,10 @@ namespace Plugins.GitNity.Editor.Tabs
 
 			string filesSelectedTxt = selectedCount > 1 ? "files" : "file";
 			string filesTotalTxt = totalCount > 1 ? "files" : "file";
+            string userCommit = EditorPrefs.GetString(GitNity.EDITOR_PREF_KEY_COMMIT_MESSAGE, "");
 
-			labelSelectedCount.text = $"{selectedCount} {filesSelectedTxt} selected, {totalCount} {filesTotalTxt} in total";
+
+            labelSelectedCount.text = $"{selectedCount} {filesSelectedTxt} selected, {totalCount} {filesTotalTxt} in total";
 			buttonCommitSelected.SetEnabled(selectedCount > 0);
 
 			// Hide/Display button push
@@ -217,7 +221,12 @@ namespace Plugins.GitNity.Editor.Tabs
 				buttonPushCommits.text = $"Push commits ({nonPushedCommits.Count})";
 				buttonPushCommits.tooltip = $"You have {nonPushedCommits.Count} commits without push";
 			}
-		}
+
+            if(!string.IsNullOrEmpty(userCommit)) {
+				Debug.Log("Restored user commit");
+                textFieldCommit.value = userCommit;
+            }
+        }
 
 		/// <summary> Select items of the list </summary>
 		/// <param name="select"></param>
@@ -234,10 +243,19 @@ namespace Plugins.GitNity.Editor.Tabs
 			UpdateElementsBySelections();
 		}
 
+		public static string GetCommitMessage(VisualElement source){
+            TextField txtField = source.Q<TextField>(texfieldCommitId);
 
-		#region Git operations
-		/// <summary> Pull changes from the repository </summary>
-		private static void OnPressPull() {
+            if (txtField != null){
+				return txtField.text;
+            }
+
+			return "";
+        }
+
+        #region Git operations
+        /// <summary> Pull changes from the repository </summary>
+        private static void OnPressPull() {
 			Debug.Log("Pulling data");
 
 			// Check if current branch has upstream branch

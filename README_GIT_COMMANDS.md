@@ -23,7 +23,7 @@ Here is a list of commands used to populate window data or execute some git oper
 
 - Diff file
     ``` sh
-    git diff --word-diff=porcelain -U9999 FILE_PATH
+    git diff --cached --word-diff=porcelain -U9999 FILE_PATH
     ```
 
 - Get commits

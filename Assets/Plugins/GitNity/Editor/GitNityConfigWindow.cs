@@ -45,8 +45,6 @@ namespace Plugins.GitNity.Editor
         private bool hasGitInstalled = false;
 
         private Vector3 scrollPos;
-
-        private string RootGitIgnoreFilePath => Path.Combine(Application.dataPath, "..", ".gitignore");
     
         [MenuItem("Tools/GitNity/GitNity Config")]
         public static void Init() {
@@ -60,12 +58,19 @@ namespace Plugins.GitNity.Editor
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu){
             GUIContent content = new GUIContent("Repaint");
             menu.AddItem(content, false, OnFocus);
+
+            GUIContent content2 = new GUIContent("Open Gitnity window");
+            menu.AddItem(content2, false, OpenGitnityWindow);
         }
 
         /// <summary> Reload config data on gain focus </summary>
         private void OnFocus() {
             LoadData();
             Repaint();
+        }
+
+        private void OpenGitnityWindow() {
+            GitNityWindow.Init();
         }
 
         private void OnGUI() {
@@ -170,7 +175,7 @@ namespace Plugins.GitNity.Editor
             originUrl = GitConfig.originUrl;
             privateSshKeyPath = GitConfig.privateSshKeyPath;
 
-            hasGitIgnoreFileInRoot = File.Exists(RootGitIgnoreFilePath);
+            hasGitIgnoreFileInRoot = File.Exists(GitNity.RootGitIgnoreFilePath);
         }
 
         /// <summary> Override local config </summary>
@@ -254,8 +259,8 @@ namespace Plugins.GitNity.Editor
                     "\n.idea";
         
         
-            File.WriteAllText(RootGitIgnoreFilePath, data);
-            Debug.Log($"<color=green>.gitignore file generated at: {RootGitIgnoreFilePath}</color>");
+            File.WriteAllText(GitNity.RootGitIgnoreFilePath, data);
+            Debug.Log($"<color=green>.gitignore file generated at: {GitNity.RootGitIgnoreFilePath}</color>");
 
             hasGitIgnoreFileInRoot = true;
             Repaint();

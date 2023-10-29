@@ -17,11 +17,13 @@ namespace Plugins.GitNity.Editor
 		// Icons: https://github.com/halak/unity-editor-icons
 
 		private static GitNityWindow window;
+		private VisualElement currentTabTemplate;
 
-		private int currentTab = 0;
+
+        private int currentTab = 0;
 	
 		[MenuItem("Tools/GitNity/GitNity window")]
-		static void Init(){
+		public static void Init(){
 			window = GetWindow<GitNityWindow>(typeof(GitNityWindow));
 
 			// Loads an icon from an image stored at the specified path
@@ -34,17 +36,31 @@ namespace Plugins.GitNity.Editor
 		}
 	
 		private void OnEnable() {
-			DrawWindow(true);
+            DrawWindow(true);
 		}
 
 		void IHasCustomMenu.AddItemsToMenu(GenericMenu menu){
 			GUIContent content = new GUIContent("Reload");
 			menu.AddItem(content, false, () => DrawWindow(true));
-		}
 
-		/// <summary> Render window with corresponding tab </summary>
-		/// <param name="reloadLoadData">Refresh data required to render this window?</param>
-		public void DrawWindow(bool reloadLoadData) {
+            GUIContent content2 = new GUIContent("Open Gitnity config window");
+            menu.AddItem(content2, false, OpenToolsWindow);
+        }
+
+        void OpenToolsWindow() {
+            GitNityConfigWindow.Init();
+        }
+
+        private void OnLostFocus() {
+			string userCommit = TabGitChangesTemplate.GetCommitMessage(currentTabTemplate);
+
+			Debug.Log("User commit message saved ");
+			EditorPrefs.SetString(GitNity.EDITOR_PREF_KEY_COMMIT_MESSAGE, userCommit);
+        }
+
+        /// <summary> Render window with corresponding tab </summary>
+        /// <param name="reloadLoadData">Refresh data required to render this window?</param>
+        public void DrawWindow(bool reloadLoadData) {
 		
 			if(!GitNity.isGitRepository)	// Do not render window and draw warnings in the OnGui Method
 				return;
@@ -75,9 +91,12 @@ namespace Plugins.GitNity.Editor
 			GitNityWindowTemplate.dropdownBranches.choices = GitNity.branches;
 			GitNityWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
 			GitNityWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => {
-				GitNity.RefreshFilesStatus();
+                GitNity.ProcessIgnoredFiles();
+                GitNity.RefreshFilesStatus();
 				DrawWindow(true);
-				Debug.Log("Data refreshed");
+				EditorApplication.RepaintProjectWindow();
+
+                Debug.Log("Data refreshed");
 			});
 		
 			LoadTab(currentTab);
@@ -108,17 +127,16 @@ namespace Plugins.GitNity.Editor
 
 		/// <summary> Load selected tab (changes/commits) </summary>
 		/// <param name="tabIdx">idx of the tab</param>
-		private void LoadTab(int tabIdx) {
-			VisualElement TabContent;
+		private void LoadTab(int tabIdx) {			
 			GitNityWindowTemplate.tabContent.Clear();
 		
 			if (tabIdx == 0) {
-				TabContent = TabGitChangesTemplate.RenderTemplate(this,GitNityWindowTemplate.tabContent);
+                currentTabTemplate = TabGitChangesTemplate.RenderTemplate(this,GitNityWindowTemplate.tabContent);
 			} else {
-				TabContent = TabGitCommits.RenderTemplate(this,GitNityWindowTemplate.tabContent);
+                currentTabTemplate = TabGitCommits.RenderTemplate(this,GitNityWindowTemplate.tabContent);
 			}
-		
-			TabContent.AddToClassList(Classes.FullHeightClass);
+
+            currentTabTemplate.AddToClassList(Classes.FullHeightClass);
 		}
 	
 		/// <summary> Bound to the branches drop down </summary>

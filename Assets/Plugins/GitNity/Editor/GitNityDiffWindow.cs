@@ -50,7 +50,7 @@ namespace Plugins.GitNity.Editor
             labelFileName.text = fileStatus.path;
 
             string filePath = fileStatus.GetFullPath();
-            var exec = GitNity.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
+            var exec = GitNity.ExecuteProcessTerminal2($"diff --cached --word-diff=porcelain -U9999 \"{filePath}\"", "git");
         
             if (exec.status != 0) {
                 Debug.LogWarning("Git diff throw: "+exec.result);

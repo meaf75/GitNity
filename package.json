@@ -1,16 +1,18 @@
 {
   "name": "com.meaf75.gitnity",
   "displayName": "gitnity",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "unity": "2021.3",
   "description": "Git integration for Unity projects, all basic tools inside the editor",
   "keywords": [
     "unity",
-    "git"
+    "git",
+    "tool",
+    "custom",
+    "editor"
   ],
   "scripts": {
-    "generate_time_recorder_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Assets/Plugins/GitNity/README.pdf",
-    "conver_png_to_web_doc": "node ./scripts/convert-github-imgs-to-webp.mjs"
+    "generate_gitnity_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Assets/Plugins/GitNity/README.pdf"
   },
   "category": "tool",
   "devDependencies": {

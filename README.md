@@ -1,8 +1,18 @@
-# GitNity
+# GitNity - Git for Unity
+
+<img src="./.github/GitNity-repo-card.png">
+
+<br>
+
+[![gitnity-assetstore-todo](.github/asset-store.webp)](https://github.com/meaf75/GitNity)
+
+<br>
+
 Git integration for Unity projects, all basic tools inside the editor
 
+Github Repository: https://github.com/meaf75/GitNity
 
-⚠ **Plugin under development**: I'm still working on this project 👷‍♂️ so be careful using it on large projects 🚧🚧
+⚠ **Plugin under development**: I'm still working on this project :construction_worker: so be careful using it on larger projects and feel free to contribute it 🚧🚧
 
 ![GitNity](./.github/plugin-screen.webp)
 ![GitNity](./.github/modified-assets-icons.webp)
@@ -10,6 +20,7 @@ Git integration for Unity projects, all basic tools inside the editor
 <div class="page-break"></div>
 
 # Features
+Unchecked means To Do
 - [x] List changes (Modified, untracked, new, merge error)
 - [x] Commit files by selecting them
 - [x] Push pending commits
@@ -21,9 +32,10 @@ Git integration for Unity projects, all basic tools inside the editor
 - [x] Generate .gitignore
 - [x] Draw status icon on files with modifications or tracked by git
 - [x] Private ssh key support
+- [x] Draw icon for ignored files/folders
 - [ ] Merge tool or open X file with the script editor assigned in preferences
 - [ ] LSF support
-- [ ] Draw icon for ignored files/folders
+- [ ] Git Stash & Git stash pop/apply
 
 # Table of content
 - [Requirements](#requirements)
@@ -89,17 +101,20 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
 
     ![gitnity-push](./.github/push.webp)
 
+<div class="page-break"></div>
+
 - Icons will be drawn over the project assets to represent their git status inside unity
     ![modified-assets](./.github/modified-assets-icons-preview.webp)
     | Status        | Icon |
     | -----------   | ----------- |
-    | Deleted       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabDeleted%20Icon.png" alt="drawing" width="40"/> |
-    | Modified      | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabEdit%20Icon.png" alt="drawing" width="40"/> |
-    | Type changed  | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" alt="drawing" width="40"/> |
-    | Renamed       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" alt="drawing" width="40"/> |
-    | Copied        | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" alt="drawing" width="40"/> |
-    | New           | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabCreate%20Icon.png" alt="drawing" width="40"/> |
-    | Unknown       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabCreate%20Icon.png" alt="drawing" width="40"/> |
+    | Deleted       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabDeleted%20Icon.png" width="40"/> |
+    | Modified      | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabEdit%20Icon.png" width="40"/> |
+    | Type changed  | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" width="40"/> |
+    | Renamed       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" width="40"/> |
+    | Copied        | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabMoved%20Icon.png" width="40"/> |
+    | New           | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabCreate%20Icon.png" width="40"/> |
+    | Unknown       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabCreate%20Icon.png" width="40"/> |
+    | Ignored       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/CollabExclude%20Icon.png" width="40"/> |
 
 - Context menu, if you right click over a element in the list of tracked files a pop up will appear with some useful actions
     ![context-menu](./.github/context-menu.webp)

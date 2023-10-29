@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -44,7 +45,9 @@ namespace Plugins.GitNity.Editor
     public static class GitNity {
 
         private const string EMPTY_GUI = "00000000000000000000000000000000";
-    
+
+        public const string EDITOR_PREF_KEY_COMMIT_MESSAGE = "gitnity_commit_msg_backup";
+
         /// <summary> More icons at: https://github.com/Zxynine/UnityEditorIcons </summary>
         private static readonly string[] StatusIcons = {
             "d_CollabCreate Icon",  // Unknown
@@ -58,6 +61,7 @@ namespace Plugins.GitNity.Editor
         };
 
         private const string MODIFIED_FOLDER_ICON_NAME = "sv_icon_dot1_pix16_gizmo"; 
+        private const string ICON_NAME_IGNORED = "CollabExclude Icon"; 
     
         public static List<GitFileStatus> filesStatus;
     
@@ -74,11 +78,18 @@ namespace Plugins.GitNity.Editor
         /// <summary> GUID of folders inside the editor to mark them as modified on gui </summary>
         private static readonly List<string> pathsGuidRegistered;
 
+        private static Dictionary<string, bool> cachedIgnoredPaths;
+
+        /// <summary> List of patterns/files/folders ignored by the user </summary>
+        private static string[] ignoredPatterns = new string[0];
+
         public static int currentBranchOptionIdx;
         public static int newBranchOptionIdx;
     
         // ##### HIGH IMPORTANCE FLAGS ##### 
         public static bool isGitRepository;
+
+        public static string RootGitIgnoreFilePath => Path.Combine(Application.dataPath, "..", ".gitignore");
 
         /// <summary> Dictionary with the short 2 letters status for a tracked file </summary>
         private static readonly Dictionary<string, string> UnmergedStatus = new() {
@@ -95,6 +106,7 @@ namespace Plugins.GitNity.Editor
         static GitNity() {
             pathsRegistered = new List<string>();
             pathsGuidRegistered = new List<string>();
+            cachedIgnoredPaths = new Dictionary<string, bool>();
 
             if(!HasGitCommandLineInstalled()) {
                 return;
@@ -102,6 +114,7 @@ namespace Plugins.GitNity.Editor
 
             // Get the status of all tracked files
             RefreshFilesStatus();
+            ProcessIgnoredFiles();
             EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
         }
     
@@ -114,8 +127,30 @@ namespace Plugins.GitNity.Editor
             // Search for the git file which match with the unity asset
             var versionedItemIdx = filesStatus.FindIndex(f => f.guid == guid);
             int modifiedFolderIdx = pathsGuidRegistered.IndexOf(guid);
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            string iconName = "";
+
+            #region Ignored files
+            if(assetPath.Trim().Length > 0) {  // Check only for assets inside the project
+                if (cachedIgnoredPaths.TryGetValue(guid, out var ignored)) {
+                    if (ignored){
+                        iconName = ICON_NAME_IGNORED;
+                    }
+                } else {
+                    bool isIgnored = false;
+                    foreach (string pattern in ignoredPatterns){
+                        if (new Regex(pattern).IsMatch(assetPath)) {
+                            isIgnored = true;
+                            break;
+                        }
+                    }
+
+                    cachedIgnoredPaths[guid] = isIgnored;
+                }
+            }
+            #endregion
         
-            if(versionedItemIdx == -1 && modifiedFolderIdx == -1)
+            if(versionedItemIdx == -1 && modifiedFolderIdx == -1 && iconName.Length == 0)
                 return;
 
             bool isSmallItem = rect.width > rect.height;
@@ -123,7 +158,6 @@ namespace Plugins.GitNity.Editor
             float size = isSmallItem ? 10 : rect.width * .4f;
 
             var iconSize = new Rect(rect.x, rect.y, size, size);
-            string iconName = "";
 
             var color = GUI.color;
 
@@ -132,12 +166,15 @@ namespace Plugins.GitNity.Editor
             }
         
             GUI.color = color;
-        
-            iconName = versionedItemIdx != -1 ? 
-                StatusIcons[(int) filesStatus[versionedItemIdx].statusType] : 
-                MODIFIED_FOLDER_ICON_NAME;
+
+            if (iconName.Length == 0){
+                iconName = versionedItemIdx != -1 ? 
+                    StatusIcons[(int) filesStatus[versionedItemIdx].statusType] : 
+                    MODIFIED_FOLDER_ICON_NAME;                
+            }
 
             var icon = EditorGUIUtility.IconContent(iconName);
+
             GUI.DrawTexture(iconSize, icon.image);
         }
     
@@ -207,6 +244,23 @@ namespace Plugins.GitNity.Editor
             }
 
             Debug.Log("Git files status refreshed");
+        }
+
+        public static async void ProcessIgnoredFiles(){
+            if (!File.Exists(RootGitIgnoreFilePath)){
+                Debug.LogWarning($"Gitignore file not found at: {RootGitIgnoreFilePath},  you can create it using the Gitnity config window");
+                return;
+            }
+
+            var gitIgnoreFile = await File.ReadAllLinesAsync(RootGitIgnoreFilePath);
+            ignoredPatterns = Array.FindAll(gitIgnoreFile, line => !line.StartsWith("#") && line.Trim().Length > 0 && line.Trim() != "\n");
+            cachedIgnoredPaths.Clear();
+
+            for (int i = 0; i < ignoredPatterns.Length; i++)            {
+                if (ignoredPatterns[i].StartsWith("*")){
+                    ignoredPatterns[i] = $".{ignoredPatterns[i]}";
+                }
+            }
         }
 
         /// <summary> Hacky method to get the plugin installation path based on an Editor window </summary>
@@ -484,6 +538,7 @@ namespace Plugins.GitNity.Editor
             }
         
             Debug.LogWarning("Push throw: "+exec.result);
+            EditorPrefs.DeleteKey(EDITOR_PREF_KEY_COMMIT_MESSAGE);
             return false;
         }
 
