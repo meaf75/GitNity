@@ -4,7 +4,7 @@
 
 <br>
 
-[![gitnity-assetstore-todo](.github/asset-store.webp)](https://github.com/meaf75/GitNity)
+[![gitnity-assetstore](.github/asset-store.webp)](https://u3d.as/3aVX)
 
 <br>
 

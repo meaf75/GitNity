@@ -50,19 +50,30 @@ namespace Plugins.GitNity.Editor
             labelFileName.text = fileStatus.path;
 
             string filePath = fileStatus.GetFullPath();
-            var exec = GitNity.ExecuteProcessTerminal2($"diff --cached --word-diff=porcelain -U9999 \"{filePath}\"", "git");
+            var exec = GitNity.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
         
             if (exec.status != 0) {
                 Debug.LogWarning("Git diff throw: "+exec.result);
                 return;
             }
         
-            string[] gitDiff;
+            string[] gitDiff = new string[0];
         
             if (fileStatus.statusType == StatusType.UNKNOWN) {
                 gitDiff = File.ReadAllLines(fileStatus.path);
             } else {
-                gitDiff = exec.result.Split("\n")[5..^1];
+                try {
+                    gitDiff = exec.result.Split("\n")[5..^1];
+                } catch (System.Exception) {
+                    // Check if file chages differ from index
+                    try {
+                        exec = GitNity.ExecuteProcessTerminal2($"diff --cached --word-diff=porcelain -U9999 \"{filePath}\"", "git");                        
+                        gitDiff = exec.result.Split("\n")[5..^1];
+                    } catch (System.Exception) {
+                        Debug.LogError($"could not open {filePath} diff");
+                        return;                        
+                    }
+                }
             }
         
             List<LineInfo> fileLines = new List<LineInfo>();
