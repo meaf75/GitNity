@@ -46,7 +46,7 @@ namespace Plugins.GitNity.Editor
 
         private const string EMPTY_GUI = "00000000000000000000000000000000";
 
-        public const string EDITOR_PREF_KEY_COMMIT_MESSAGE = "gitnity_commit_msg_backup";
+        public const string PREF_KEY_COMMIT_MESSAGE = "gitnity_commit_msg_backup";
 
         /// <summary> More icons at: https://github.com/Zxynine/UnityEditorIcons </summary>
         private static readonly string[] StatusIcons = {
@@ -78,7 +78,7 @@ namespace Plugins.GitNity.Editor
         /// <summary> GUID of folders inside the editor to mark them as modified on gui </summary>
         private static readonly List<string> pathsGuidRegistered;
 
-        private static Dictionary<string, bool> cachedIgnoredPaths;
+        public static Dictionary<string, bool> cachedIgnoredPaths;
 
         /// <summary> List of patterns/files/folders ignored by the user </summary>
         private static string[] ignoredPatterns = new string[0];
@@ -513,13 +513,14 @@ namespace Plugins.GitNity.Editor
         public static bool CommitStagedFiles(string message) {
             var exec = ExecuteProcessTerminal2($"commit -m \"{message}\"", "git");
 
-            if (exec.status == 0) {
-                Debug.Log($"<color=green>Changes commited</color>");
-                return true;
+            if (exec.status != 0) {
+                Debug.LogWarning("Git commit throw: "+exec.result);
+                return false;
             }
         
-            Debug.LogWarning("Git commit throw: "+exec.result);
-            return false;
+            PlayerPrefs.DeleteKey(PREF_KEY_COMMIT_MESSAGE);
+            Debug.Log($"<color=green>Changes commited</color>");
+            return true;
         }
 
         /// <summary> Push changes to the remote repository </summary>
@@ -538,7 +539,6 @@ namespace Plugins.GitNity.Editor
             }
         
             Debug.LogWarning("Push throw: "+exec.result);
-            EditorPrefs.DeleteKey(EDITOR_PREF_KEY_COMMIT_MESSAGE);
             return false;
         }
 

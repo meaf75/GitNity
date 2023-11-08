@@ -55,7 +55,7 @@ namespace Plugins.GitNity.Editor
 			string userCommit = TabGitChangesTemplate.GetCommitMessage(currentTabTemplate);
 
 			Debug.Log("User commit message saved ");
-			EditorPrefs.SetString(GitNity.EDITOR_PREF_KEY_COMMIT_MESSAGE, userCommit);
+			PlayerPrefs.SetString(GitNity.PREF_KEY_COMMIT_MESSAGE, userCommit);
         }
 
         /// <summary> Render window with corresponding tab </summary>

@@ -35,7 +35,9 @@ namespace Plugins.GitNity.Editor {
 				if (movedAssets[i].EndsWith(".cs")) // If is a c# file then the GitNity constructor on domain reload will refresh the data
 					return;
 
-				Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
+				string guid = AssetDatabase.AssetPathToGUID(movedAssets[i]);
+				GitNity.cachedIgnoredPaths.Remove(guid);
+				Debug.Log($"Moved Asset, from: {movedFromAssetPaths[i]} to: {movedAssets[i]}");
 			}
 
 			if (!GitNity.HasGitCommandLineInstalled())

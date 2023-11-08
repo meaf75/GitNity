@@ -204,7 +204,7 @@ namespace Plugins.GitNity.Editor.Tabs
 
 			string filesSelectedTxt = selectedCount > 1 ? "files" : "file";
 			string filesTotalTxt = totalCount > 1 ? "files" : "file";
-            string userCommit = EditorPrefs.GetString(GitNity.EDITOR_PREF_KEY_COMMIT_MESSAGE, "");
+            string userCommit = PlayerPrefs.GetString(GitNity.PREF_KEY_COMMIT_MESSAGE, "");
 
 
             labelSelectedCount.text = $"{selectedCount} {filesSelectedTxt} selected, {totalCount} {filesTotalTxt} in total";
