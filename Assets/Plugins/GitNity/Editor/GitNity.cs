@@ -574,16 +574,48 @@ namespace Plugins.GitNity.Editor
         /// <summary> Revert changes of given files </summary>
         /// <param name="files">files to revert</param>
         public static bool RevertFiles(GitFileStatus[] files) {
-            string[] paths = files.Select(f => $"\"{f.GetFullPath()}\"").ToArray();
-            var exec = ExecuteProcessTerminal2($"clean -f -q -- {string.Join(" ", paths)}", "git");
+            string quotedPaths = "";
+            string untrackedFilesPaths = "";
+            
+            for (var i = 0; i < files.Length; i++) {
+                var file = files[i];
+                
+                if (file.statusType == StatusType.UNKNOWN) {
+                    // File is new, should be deleted
+                    if (untrackedFilesPaths.Length > 0) {
+                        untrackedFilesPaths += " ";
+                    }
+                    
+                    untrackedFilesPaths += $"\"{file.GetFullPath()}\"";
+                    continue;
+                }
 
-            if (exec.status == 0) {
-                Debug.Log($"Files reverted:\n{string.Join("\n",paths)}");
-                return true;
+                if (quotedPaths.Length > 0) {
+                    quotedPaths += " ";
+                }
+                
+                quotedPaths += $"\"{file.GetFullPath()}\"";
             }
+
+            // Revert tracked files
+            var exec = ExecuteProcessTerminal2($"checkout {quotedPaths}", "git");
+            if (exec.status != 0) {
+                Debug.LogWarning("Revert files throw: "+exec.result);
+                return false;
+            }
+            Debug.Log($"Files reverted:\n{string.Join("\n",quotedPaths)}");
+
+            // Revert untracked files
+            if (untrackedFilesPaths.Length > 0) {
+                exec = ExecuteProcessTerminal2($"clean -f -q -- {string.Join(" ", untrackedFilesPaths)}", "git");
+                if (exec.status != 0) {
+                    Debug.LogWarning("Revert untracked files throw: "+exec.result);
+                    return false;
+                }
+            }
+            Debug.Log($"Untracked Files reverted:\n{string.Join("\n",untrackedFilesPaths)}");
         
-            Debug.LogWarning("Revert files throw: "+exec.result);
-            return false;
+            return true;
         }
 
         /// <summary> switch to given branch idx </summary>

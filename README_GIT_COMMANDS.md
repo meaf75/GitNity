@@ -16,9 +16,14 @@ Here is a list of commands used to populate window data or execute some git oper
     git for-each-ref --sort -committerdate --format "%(refname) %(objectname) %(*objectname)"
     ```
 
-- Revert file
+- Revert file (untracked)
     ``` sh
     git clean -f -q -- "PATH"
+    ```
+
+- Revert file (tracked)
+    ``` sh
+    git checkout "PATH"
     ```
 
 - Diff file
