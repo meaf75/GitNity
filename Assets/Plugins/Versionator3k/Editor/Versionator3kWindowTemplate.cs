@@ -1,7 +1,7 @@
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor {
-    public static class GitNityWindowTemplate
+namespace Plugins.Versionator3k.Editor {
+    public static class Versionator3kWindowTemplate
     {
         public static Label labelBranch;
         public static VisualElement tabContent;

@@ -1,6 +1,6 @@
 {
-  "name": "com.meaf75.gitnity",
-  "displayName": "GitNity",
+  "name": "com.meaf75.versionator3k",
+  "displayName": "Versionator3k",
   "version": "0.1.2",
   "unity": "2021.3",
   "description": "Git integration for Unity projects, all basic tools inside the editor",

@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
-	public static class GitNityCommitTemplate
+	public static class Versionator3kCommitTemplate
 	{
 	
 		private struct Elements {
@@ -31,7 +31,7 @@ namespace Plugins.GitNity.Editor
 	
 		private static VisualTreeAsset GetTemplate() {
 			if(!template)
-				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.pluginPath}/Templates/{nameof(GitNityCommitTemplate)}.uxml");
+				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/{nameof(Versionator3kCommitTemplate)}.uxml");
 
 			return template;
 		}

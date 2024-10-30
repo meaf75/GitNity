@@ -3,7 +3,7 @@ using System.Net;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
     /// <summary> Config if the local repository </summary>
     public static class GitConfig {
@@ -14,11 +14,11 @@ namespace Plugins.GitNity.Editor
         public static string privateSshKeyPath;
     
         public static void LoadData() {
-            var usernameExec = GitNity.ExecuteProcessTerminal2("config user.name", "git");
-            var emailExec = GitNity.ExecuteProcessTerminal2("config user.email", "git");
+            var usernameExec = Versionator.ExecuteProcessTerminal2("config user.name", "git");
+            var emailExec = Versionator.ExecuteProcessTerminal2("config user.email", "git");
         
-            var originExec = GitNity.ExecuteProcessTerminal2($"config --get remote.{GitNity.ORIGIN_NAME}.url", "git");
-            var sshKeyPathExec = GitNity.ExecuteProcessTerminal2($"config core.sshCommand", "git");
+            var originExec = Versionator.ExecuteProcessTerminal2($"config --get remote.{Versionator.ORIGIN_NAME}.url", "git");
+            var sshKeyPathExec = Versionator.ExecuteProcessTerminal2("config core.sshCommand", "git");
         
             userName = usernameExec.result.Split("\n")[0];
             userEmail = emailExec.result.Split("\n")[0];
@@ -34,24 +34,24 @@ namespace Plugins.GitNity.Editor
     }
     
     /// <summary> Window to facilitate the interaction with git </summary>
-    public class GitNityConfigWindow : EditorWindow, IHasCustomMenu {
+    public class Versionator3kConfigWindow : EditorWindow, IHasCustomMenu {
     
         private string userName;
         private string userEmail;
         private string originUrl;
         private string privateSshKeyPath;
 
-        private bool hasGitIgnoreFileInRoot = false;
-        private bool hasGitInstalled = false;
+        private bool hasGitIgnoreFileInRoot;
+        private bool hasGitInstalled;
 
         private Vector3 scrollPos;
     
-        [MenuItem("Tools/GitNity/GitNity Config")]
+        [MenuItem("Tools/Versionator3k/Versionator3k Config")]
         public static void Init() {
-            // var wnd = GetWindowWithRect<GitNityConfigWindow>(new Rect(0, 0, 527, 155));
-            var wnd = GetWindow<GitNityConfigWindow>();
+            // var wnd = GetWindowWithRect<Versionator3kConfigWindow>(new Rect(0, 0, 527, 155));
+            var wnd = GetWindow<Versionator3kConfigWindow>();
         
-            wnd.titleContent = new GUIContent("GitNity Config");
+            wnd.titleContent = new GUIContent("Versionator3k Config");
         }
     
         // This interface implementation is automatically called by Unity.
@@ -70,7 +70,7 @@ namespace Plugins.GitNity.Editor
         }
 
         private void OpenGitnityWindow() {
-            GitNityWindow.Init();
+            Versionator3kWindow.Init();
         }
 
         private void OnGUI() {
@@ -80,7 +80,7 @@ namespace Plugins.GitNity.Editor
             bool warningsActive = false;
         
             if(!hasGitInstalled) {
-                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use GitNity, https://git-scm.com/download", MessageType.Error);
+                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use Versionator3k, https://git-scm.com/download", MessageType.Error);
                 return;
             }
 
@@ -90,7 +90,7 @@ namespace Plugins.GitNity.Editor
             }
 
 
-            if (!GitNity.isGitRepository) {
+            if (!Versionator.isGitRepository) {
                 EditorGUILayout.HelpBox("Current project seems to not be a git repository", MessageType.Warning);
                 warningsActive = true;
             }
@@ -132,7 +132,7 @@ namespace Plugins.GitNity.Editor
         
             bool hasChanges = changedName || changedEmail || changedOrigin || changedSshKey;
 
-            if (!GitNity.isGitRepository) {
+            if (!Versionator.isGitRepository) {
                 GUILayout.Space(3);
             
                 if (GUILayout.Button("Initialize git repository")) {
@@ -160,14 +160,14 @@ namespace Plugins.GitNity.Editor
         /// <summary> Load user repository config </summary>
         private void LoadData() {
 
-            hasGitInstalled = GitNity.HasGitCommandLineInstalled();
+            hasGitInstalled = Versionator.HasGitCommandLineInstalled();
 
             if(!hasGitInstalled) {
                 return;
             }
 
 
-            GitNity.RefreshFilesStatus();
+            Versionator.RefreshFilesStatus();
             GitConfig.LoadData();
         
             userName = GitConfig.userName;
@@ -175,7 +175,7 @@ namespace Plugins.GitNity.Editor
             originUrl = GitConfig.originUrl;
             privateSshKeyPath = GitConfig.privateSshKeyPath;
 
-            hasGitIgnoreFileInRoot = File.Exists(GitNity.RootGitIgnoreFilePath);
+            hasGitIgnoreFileInRoot = File.Exists(Versionator.RootGitIgnoreFilePath);
         }
 
         /// <summary> Override local config </summary>
@@ -184,7 +184,7 @@ namespace Plugins.GitNity.Editor
             bool changesSaved = false;
         
             if (userName != GitConfig.userName) {
-                var cmdExec = GitNity.ExecuteProcessTerminal($"config user.name {userName}", "git");
+                var cmdExec = Versionator.ExecuteProcessTerminal($"config user.name {userName}", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Save username throw output: " + cmdExec.result);
@@ -196,7 +196,7 @@ namespace Plugins.GitNity.Editor
             }
 
             if (userEmail != GitConfig.userEmail) {
-                var cmdExec = GitNity.ExecuteProcessTerminal($"config user.email {userEmail}", "git");
+                var cmdExec = Versionator.ExecuteProcessTerminal($"config user.email {userEmail}", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Save email throw output: " + cmdExec.result);
@@ -209,7 +209,7 @@ namespace Plugins.GitNity.Editor
             
             if (privateSshKeyPath != GitConfig.privateSshKeyPath) {
                 privateSshKeyPath = privateSshKeyPath.Replace(@"\","/");
-                var cmdExec = GitNity.ExecuteProcessTerminal2($"config core.sshCommand \"ssh -i {privateSshKeyPath}\"", "git");
+                var cmdExec = Versionator.ExecuteProcessTerminal2($"config core.sshCommand \"ssh -i {privateSshKeyPath}\"", "git");
 
                 if (cmdExec.status != 0) {
                     Debug.LogWarning("Set ssh key path throw output: " + cmdExec.result);
@@ -224,9 +224,9 @@ namespace Plugins.GitNity.Editor
                 (string result, int status) cmdExec;
 
                 if (string.IsNullOrEmpty(GitConfig.originUrl)) {
-                    cmdExec = GitNity.ExecuteProcessTerminal($"remote add origin {originUrl}", "git");
+                    cmdExec = Versionator.ExecuteProcessTerminal($"remote add origin {originUrl}", "git");
                 } else {
-                    cmdExec = GitNity.ExecuteProcessTerminal($"remote set-url origin {originUrl}", "git");
+                    cmdExec = Versionator.ExecuteProcessTerminal($"remote set-url origin {originUrl}", "git");
                 }
 
                 if (cmdExec.status != 0) {
@@ -259,8 +259,8 @@ namespace Plugins.GitNity.Editor
                     "\n.idea";
         
         
-            File.WriteAllText(GitNity.RootGitIgnoreFilePath, data);
-            Debug.Log($"<color=green>.gitignore file generated at: {GitNity.RootGitIgnoreFilePath}</color>");
+            File.WriteAllText(Versionator.RootGitIgnoreFilePath, data);
+            Debug.Log($"<color=green>.gitignore file generated at: {Versionator.RootGitIgnoreFilePath}</color>");
 
             hasGitIgnoreFileInRoot = true;
             Repaint();
@@ -268,16 +268,16 @@ namespace Plugins.GitNity.Editor
 
         /// <summary> Run a simple "git init" in the current unity project </summary>
         private void InitializeRepositoryFolder() {
-            var exec = GitNity.ExecuteProcessTerminal2("init", "git");
+            var exec = Versionator.ExecuteProcessTerminal2("init", "git");
 
             if (exec.status != 0) {
                 Debug.LogWarning("An error occured trying to initialize project as git repository");
                 return;
             }
         
-            Debug.Log($"<color=green>Project initialized as git repository</color>");
+            Debug.Log("<color=green>Project initialized as git repository</color>");
 
-            GitNity.isGitRepository = true;
+            Versionator.isGitRepository = true;
             LoadData();
             Repaint();
         }

@@ -1,21 +1,21 @@
-# GitNity - Git for Unity
+# Versionator3k - Git for Unity
 
-<img src="./.github/GitNity-repo-card.png">
+<img src="./.github/versionator3k-repo-card.png">
 
 <br>
 
-[![gitnity-assetstore](.github/asset-store.webp)](https://u3d.as/3aVX)
+[![versionator3k-assetstore](.github/asset-store.webp)](https://u3d.as/3aVX)
 
 <br>
 
 Git integration for Unity projects, all basic tools inside the editor
 
-Github Repository: https://github.com/meaf75/GitNity
+Github Repository: https://github.com/meaf75/Versionator3k
 
 ⚠ **Plugin under development**: I'm still working on this project :construction_worker: so be careful using it on larger projects and feel free to contribute it 🚧🚧
 
-![GitNity](./.github/plugin-screen.webp)
-![GitNity](./.github/modified-assets-icons.webp)
+![Versionator3k](./.github/plugin-screen.webp)
+![Versionator3k](./.github/modified-assets-icons.webp)
 
 <div class="page-break"></div>
 
@@ -44,7 +44,7 @@ Unchecked means To Do
     - [From this repo](#from-this-repo)
 - [Instructions](#instructions)
     - [Configuration](#configuration)
-    - [GitNity window](#gitnity-window)
+    - [Versionator3k window](#versionator3k-window)
         - [Branching](#branching)
         - [Commits tab](#commits-tab)
         - [Diff window](#diff-window)
@@ -60,31 +60,31 @@ Unchecked means To Do
 ## From a git url
 You can install this plugin via assets manager from a git url
 
-![install-1](./.github/pm-gitnity.webp)
-![install-2](./.github/pm-gitnity-2.webp)
+![install-1](./.github/pm-versionator3k.webp)
+![install-2](./.github/pm-versionator3k-2.webp)
 
 More information at: https://docs.unity3d.com/Manual/upm-ui-giturl.html
 
 ```
-https://github.com/meaf75/GitNity.git?path=/Assets/Plugins/GitNity
+https://github.com/meaf75/Versionator3k.git?path=/Assets/Plugins/Versionator3k
 ```
 ## From this repo
-Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins/GitNity/) inside a folder in your unity project located at the same route
+Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins/Versionator3k/) inside a folder in your unity project located at the same route
 
 <div class="page-break"></div>
 
 # Instructions
 
 ## Configuration
-- All windows are located under Tools/GitNity.
+- All windows are located under Tools/Versionator3k.
 
     ![path](./.github/w-location.webp)
 
-- Configuration window allows you setup repository information (Tools/GitNity/GitNity Config).
+- Configuration window allows you setup repository information (Tools/Versionator3k/Versionator3k Config).
 
     ![config-window](./.github/config-window.webp)
 
-- Make sure your project is a git repository if not then you can initialize your project from the config window (Tools/GitNity/GitNity Config).
+- Make sure your project is a git repository if not then you can initialize your project from the config window (Tools/Versionator3k/Versionator3k Config).
 
     ![config-window-warnings](./.github/w-config-warnings.webp)
 
@@ -92,14 +92,14 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
 
     ![config-window-warnings](./.github/ssh-key.webp)
 
-## GitNity window
-- First you will need to select the files you want to commit, you can do it by selecting the files in the GitNity window (Tools/GitNity/GitNity Window), add a commit message and add a commit message, finally you have to click the "Commit selected" button, this action will add selected items and commit them.
+## Versionator3k window
+- First you will need to select the files you want to commit, you can do it by selecting the files in the Versionator3k window (Tools/Versionator3k/Versionator3k Window), add a commit message and add a commit message, finally you have to click the "Commit selected" button, this action will add selected items and commit them.
 
-    ![gitnity-window-select](./.github/select-files-to-commit.webp)
+    ![versionator3k-window-select](./.github/select-files-to-commit.webp)
 
 - After commit your files the final step is push your commit, when you have commits without push a "push" button will apear next to the "Commit selected" button, click it to push your pending commits, this action will make the selected files to disappear from the list don't worry they are staged with the new commit.
 
-    ![gitnity-push](./.github/push.webp)
+    ![versionator3k-push](./.github/push.webp)
 
 <div class="page-break"></div>
 
@@ -120,7 +120,7 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
     ![context-menu](./.github/context-menu.webp)
 
 ### Branching
-- branching, you can switch between git branches by clicking over the drop down at the top right corner of the GitNity window, all tracked branches will be displayed as value in the dropdown menu
+- branching, you can switch between git branches by clicking over the drop down at the top right corner of the Versionator3k window, all tracked branches will be displayed as value in the dropdown menu
     ![swith-branch](./.github/switch-branch.webp)
 
 - you can also create a new branch by selecting "New branch..." option in the branch dropdown.
@@ -131,7 +131,7 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
     ![new-branch-window](./.github/new-branch-window.webp)
 
 ### Commits tab
-- You can list the commits made in a specific branch by selecting the "Commits" tab in the GitNity window
+- You can list the commits made in a specific branch by selecting the "Commits" tab in the Versionator3k window
 
     ![commit-window](./.github/commits-window.webp)
 

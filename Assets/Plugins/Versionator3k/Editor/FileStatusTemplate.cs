@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor {
+namespace Plugins.Versionator3k.Editor {
 	public static class FileStatusTemplate
 	{
 		private struct Elements
@@ -125,7 +125,7 @@ namespace Plugins.GitNity.Editor {
 		private static VisualTreeAsset GetTemplate()
 		{
 			if (!template)
-				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
+				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/{nameof(FileStatusTemplate)}.uxml");
 
 			return template;
 		}
@@ -145,9 +145,9 @@ namespace Plugins.GitNity.Editor {
 
 			void OpenDiffWindowForFile(DropdownMenuAction _)
 			{
-				var windowDiff = ScriptableObject.CreateInstance<GitNityDiffWindow>();
-				windowDiff.titleContent = new GUIContent($"Viewing {GitNity.filesStatus[idx].path}");
-				windowDiff.OpenForFile(GitNity.filesStatus[idx]);
+				var windowDiff = ScriptableObject.CreateInstance<Versionator3kDiffWindow>();
+				windowDiff.titleContent = new GUIContent($"Viewing {Versionator.filesStatus[idx].path}");
+				windowDiff.OpenForFile(Versionator.filesStatus[idx]);
 
 				windowDiff.Show();
 			}
@@ -156,10 +156,10 @@ namespace Plugins.GitNity.Editor {
 			void MenuBuilder(ContextualMenuPopulateEvent evtMenu)
 			{
 				evtMenu.menu.AppendAction("Show in explorer", OnClickShowInExplorer, _ => DropdownMenuAction.Status.Normal, idx);
-				evtMenu.menu.AppendAction("View changes", OpenDiffWindowForFile, (a) => DropdownMenuAction.Status.Normal, idx);
+				evtMenu.menu.AppendAction("View changes", OpenDiffWindowForFile, a => DropdownMenuAction.Status.Normal, idx);
 				evtMenu.menu.AppendAction("Ping file", bindProperties.OnClickPingFile, _ => DropdownMenuAction.Status.Normal, idx);
 				evtMenu.menu.AppendAction("Revert", bindProperties.OnClickRevertFiles, _ => DropdownMenuAction.Status.Normal, idx);
-				evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), (a) => DropdownMenuAction.Status.Normal, idx);
+				evtMenu.menu.AppendAction("Delete", a => Debug.Log(a.userData as string), a => DropdownMenuAction.Status.Normal, idx);
 			}
 
 			if (registeredRightClickManipulators.ContainsKey(bindProperties.Target))

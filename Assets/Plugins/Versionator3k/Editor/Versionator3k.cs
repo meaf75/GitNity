@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
     /// <summary> Short Git track status </summary>
     public enum StatusType {
@@ -21,12 +21,12 @@ namespace Plugins.GitNity.Editor
         RENAMED = 5,
         COPIED = 6,
         MERGE_ERROR = 7
-    };
+    }
 
     /// <summary> Contain each git tracked file resume </summary>
     public struct GitFileStatus {
         public bool isMergeError;
-        /// <summary> Is this file selected on the GitNity window list? </summary>
+        /// <summary> Is this file selected on the Versionator3k window list? </summary>
         public bool isSelected;
         /// <summary> Long name for the status of the file </summary>
         public string statusName;
@@ -42,11 +42,11 @@ namespace Plugins.GitNity.Editor
 
     /// <summary> Class in charge of all git operations </summary>
     [InitializeOnLoad]
-    public static class GitNity {
+    public static class Versionator {
 
         private const string EMPTY_GUI = "00000000000000000000000000000000";
 
-        public const string PREF_KEY_COMMIT_MESSAGE = "gitnity_commit_msg_backup";
+        public const string PREF_KEY_COMMIT_MESSAGE = "versionator3k_commit_msg_backup";
 
         /// <summary> More icons at: https://github.com/Zxynine/UnityEditorIcons </summary>
         private static readonly string[] StatusIcons = {
@@ -103,7 +103,7 @@ namespace Plugins.GitNity.Editor
         };
 
         /// <summary> Initialize the plugin </summary>
-        static GitNity() {
+        static Versionator() {
             pathsRegistered = new List<string>();
             pathsGuidRegistered = new List<string>();
             cachedIgnoredPaths = new Dictionary<string, bool>();
@@ -179,8 +179,8 @@ namespace Plugins.GitNity.Editor
         }
     
         /// <summary> Pull & parse all the data from basic git command like all branches or current branch </summary>
-        /// <param name="window">The GitNity window editor to get the plugin installation path </param>
-        public static void LoadData(GitNityWindow window) {
+        /// <param name="window">The Versionator3k window editor to get the plugin installation path </param>
+        public static void LoadData(Versionator3kWindow window) {
             pluginPath = GetPluginPath(window);
         
             // Get use current branch
@@ -213,7 +213,7 @@ namespace Plugins.GitNity.Editor
             }
         }
 
-        /// <summary> Cache and parse a "git status" command to build the GitNity info to be used by the main window  </summary>
+        /// <summary> Cache and parse a "git status" command to build the Versionator3k info to be used by the main window  </summary>
         public static void RefreshFilesStatus() {
             // Get files with status
             var statusExec = ExecuteProcessTerminal2("status -u -s", "git");
@@ -264,7 +264,7 @@ namespace Plugins.GitNity.Editor
         }
 
         /// <summary> Hacky method to get the plugin installation path based on an Editor window </summary>
-        /// <param name="target">Any GitNity Editor window</param>
+        /// <param name="target">Any Versionator3k Editor window</param>
         /// <returns>Path of the plugin</returns>
         public static string GetPluginPath(EditorWindow target) {
             var script = MonoScript.FromScriptableObject(target);
@@ -427,7 +427,7 @@ namespace Plugins.GitNity.Editor
                 process.WaitForExit();
                 return (output, process.ExitCode);
             } catch (Exception e) {
-                UnityEngine.Debug.LogError(e);
+                Debug.LogError(e);
                 return (null, 1);
             }
         }
@@ -519,7 +519,7 @@ namespace Plugins.GitNity.Editor
             }
         
             PlayerPrefs.DeleteKey(PREF_KEY_COMMIT_MESSAGE);
-            Debug.Log($"<color=green>Changes commited</color>");
+            Debug.Log("<color=green>Changes commited</color>");
             return true;
         }
 
@@ -646,7 +646,7 @@ namespace Plugins.GitNity.Editor
             try {
                 ExecuteProcessTerminal2("", "git");
             } catch(Exception e) {
-                Debug.LogError($"\"git\" was not detected on the system path, please install it before use GitNity, https://git-scm.com/download \n{e.Message}");
+                Debug.LogError($"\"git\" was not detected on the system path, please install it before use Versionator3k, https://git-scm.com/download \n{e.Message}");
                 return false;
             }
 

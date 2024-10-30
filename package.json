@@ -1,6 +1,6 @@
 {
-  "name": "com.meaf75.gitnity",
-  "displayName": "gitnity",
+  "name": "com.meaf75.versionator3k",
+  "displayName": "versionator3k",
   "version": "0.1.0",
   "unity": "2021.3",
   "description": "Git integration for Unity projects, all basic tools inside the editor",
@@ -12,7 +12,7 @@
     "editor"
   ],
   "scripts": {
-    "generate_gitnity_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Assets/Plugins/GitNity/README.pdf"
+    "generate_versionator3k_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Assets/Plugins/Versionator3k/README.pdf"
   },
   "category": "tool",
   "devDependencies": {

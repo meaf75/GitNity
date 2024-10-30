@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
-    public class GitNityDiffWindow : EditorWindow {
+    public class Versionator3kDiffWindow : EditorWindow {
 
         enum TextType {
             NONE, JUMPLINE, ADD, REMOVE        
@@ -41,7 +42,7 @@ namespace Plugins.GitNity.Editor
             rootVisualElement.Clear();
         
             // Import UXML template
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{GitNity.GetPluginPath(this)}/Templates/GitNityDiffWindow.uxml");
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.GetPluginPath(this)}/Templates/Versionator3kDiffWindow.uxml");
             VisualElement labelFromUXML = visualTree.Instantiate();
             rootVisualElement.Add(labelFromUXML);
         
@@ -50,7 +51,7 @@ namespace Plugins.GitNity.Editor
             labelFileName.text = fileStatus.path;
 
             string filePath = fileStatus.GetFullPath();
-            var exec = GitNity.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
+            var exec = Versionator.ExecuteProcessTerminal2($"diff --word-diff=porcelain -U9999 \"{filePath}\"", "git");
         
             if (exec.status != 0) {
                 Debug.LogWarning("Git diff throw: "+exec.result);
@@ -64,12 +65,12 @@ namespace Plugins.GitNity.Editor
             } else {
                 try {
                     gitDiff = exec.result.Split("\n")[5..^1];
-                } catch (System.Exception) {
+                } catch (Exception) {
                     // Check if file chages differ from index
                     try {
-                        exec = GitNity.ExecuteProcessTerminal2($"diff --cached --word-diff=porcelain -U9999 \"{filePath}\"", "git");                        
+                        exec = Versionator.ExecuteProcessTerminal2($"diff --cached --word-diff=porcelain -U9999 \"{filePath}\"", "git");                        
                         gitDiff = exec.result.Split("\n")[5..^1];
-                    } catch (System.Exception) {
+                    } catch (Exception) {
                         Debug.LogError($"could not open {filePath} diff");
                         return;                        
                     }

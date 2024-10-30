@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor.Tabs
+namespace Plugins.Versionator3k.Editor.Tabs
 {
 	public static class TabGitChangesTemplate {
 
@@ -23,7 +23,7 @@ namespace Plugins.GitNity.Editor.Tabs
 	
 		private static bool isFocusedTextField;
 	
-		private static int commitsBehind = 0;
+		private static int commitsBehind;
 		private static string branchUpstream = "";
 
 		private static List<string> nonPushedCommits;
@@ -31,12 +31,12 @@ namespace Plugins.GitNity.Editor.Tabs
 		private const string texfieldCommitId = "textfield-commit";
 
         /// <summary> Add Visual element to given container </summary>
-        /// <param name="gitNityWindow">parent window</param>
+        /// <param name="versionator3kWindow">parent window</param>
         /// <param name="container">where to add this visual element</param>
         /// <returns></returns>
-        public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container) {
+        public static VisualElement RenderTemplate(Versionator3kWindow versionator3kWindow, VisualElement container) {
 			var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-				$"{GitNity.GetPluginPath(gitNityWindow)}/Templates/TabGitChanges.uxml");
+				$"{Versionator.GetPluginPath(versionator3kWindow)}/Templates/TabGitChanges.uxml");
 			var template = UIAsset.Instantiate();
 			container.Add(template);
 
@@ -52,7 +52,7 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Load required data to render this visual element </summary>
 		private static void LoadData() {
 			// Commits behind
-			var statusBranchExec = GitNity.ExecuteProcessTerminal( $"status -b --porcelain=v2", "git");
+			var statusBranchExec = Versionator.ExecuteProcessTerminal( "status -b --porcelain=v2", "git");
 			var statusOutputLines = statusBranchExec.result.Split("\n");
 
 			foreach (var statusOutputLine in statusOutputLines) {
@@ -68,7 +68,7 @@ namespace Plugins.GitNity.Editor.Tabs
 			}
 		
 			// Get non pushed commits
-			var nonPushedCommitsExec = GitNity.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
+			var nonPushedCommitsExec = Versionator.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
 			var localCommits = nonPushedCommitsExec.result.Split("\n");
             
 			// Fill non pushed commits
@@ -120,11 +120,11 @@ namespace Plugins.GitNity.Editor.Tabs
 				FileStatusTemplate.BindProperties properties;
 			
 				void Callback(ChangeEvent<bool> evt) => OnClickFileToggle(i);
-				void OnClickResolve(int idx) => OnClickResolveMergeError(GitNity.filesStatus[idx]);
+				void OnClickResolve(int idx) => OnClickResolveMergeError(Versionator.filesStatus[idx]);
 			
 				properties.Target = e;
 				properties.Idx = i;
-				properties.gitFileStatus = GitNity.filesStatus[i];
+				properties.gitFileStatus = Versionator.filesStatus[i];
 				properties.OnClickToogleFile = Callback; 
 				properties.OnClickShowInExplorer = ShowInExplorer; 
 				properties.OnClickPingFile = PingFile; 
@@ -133,7 +133,7 @@ namespace Plugins.GitNity.Editor.Tabs
 			
 				FileStatusTemplate.BindItem(properties);
 			};
-			listViewContainer.itemsSource = GitNity.filesStatus;
+			listViewContainer.itemsSource = Versionator.filesStatus;
 		
 			RefreshPullButton();
 		}
@@ -160,7 +160,7 @@ namespace Plugins.GitNity.Editor.Tabs
 			if(evt.keyCode != KeyCode.Space || isFocusedTextField || selectedIndices.Length == 0)
 				return;
 			
-			var filesStatus = GitNity.filesStatus;
+			var filesStatus = Versionator.filesStatus;
 
 			if (selectedIndices.Count() > 1) {
 
@@ -198,25 +198,25 @@ namespace Plugins.GitNity.Editor.Tabs
 	
 		/// <summary> Refresh visual elements data </summary>
 		private static void UpdateElementsBySelections() {
-			var filesStatus = GitNity.filesStatus;
+			var filesStatus = Versionator.filesStatus;
 			int selectedCount = filesStatus.FindAll(f => f.isSelected).Count;
 			int totalCount = filesStatus.Count;
 
 			string filesSelectedTxt = selectedCount > 1 ? "files" : "file";
 			string filesTotalTxt = totalCount > 1 ? "files" : "file";
-            string userCommit = PlayerPrefs.GetString(GitNity.PREF_KEY_COMMIT_MESSAGE, "");
+            string userCommit = PlayerPrefs.GetString(Versionator.PREF_KEY_COMMIT_MESSAGE, "");
 
 
             labelSelectedCount.text = $"{selectedCount} {filesSelectedTxt} selected, {totalCount} {filesTotalTxt} in total";
 			buttonCommitSelected.SetEnabled(selectedCount > 0);
 
 			// Hide/Display button push
-			if (buttonPushCommits.ClassListContains(GitNityWindow.Classes.DisplayNoneClass)) {
-				buttonPushCommits.RemoveFromClassList(GitNityWindow.Classes.DisplayNoneClass);
+			if (buttonPushCommits.ClassListContains(Versionator3kWindow.Classes.DisplayNoneClass)) {
+				buttonPushCommits.RemoveFromClassList(Versionator3kWindow.Classes.DisplayNoneClass);
 			}
 
 			if (nonPushedCommits.Count == 0) {
-				buttonPushCommits.AddToClassList(GitNityWindow.Classes.DisplayNoneClass);
+				buttonPushCommits.AddToClassList(Versionator3kWindow.Classes.DisplayNoneClass);
 			} else {
 				buttonPushCommits.text = $"Push commits ({nonPushedCommits.Count})";
 				buttonPushCommits.tooltip = $"You have {nonPushedCommits.Count} commits without push";
@@ -231,7 +231,7 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Select items of the list </summary>
 		/// <param name="select"></param>
 		private static void SelectAllListElements(bool select) {
-			var filesStatus = GitNity.filesStatus;
+			var filesStatus = Versionator.filesStatus;
 			for (var i = 0; i < filesStatus.Count; i++) {
 				var fileStatus = filesStatus[i];
 				fileStatus.isSelected = select;
@@ -260,15 +260,15 @@ namespace Plugins.GitNity.Editor.Tabs
 
 			// Check if current branch has upstream branch
 			var exec =
-				GitNity.ExecuteProcessTerminal(
-					$"pull {GitNity.ORIGIN_NAME} {GitNity.currentBranchName} --allow-unrelated-histories", "git");
+				Versionator.ExecuteProcessTerminal(
+					$"pull {Versionator.ORIGIN_NAME} {Versionator.currentBranchName} --allow-unrelated-histories", "git");
 
 			if (exec.status != 0) {
 				Debug.LogWarning("Pull changes throw: "+exec.result);
 				return;
 			}
 			
-			Debug.Log($"<color=green>New changes pulled ✔✔✔</color>");
+			Debug.Log("<color=green>New changes pulled \u2714\u2714\u2714</color>");
 		
 			RefreshTemplate();
 		}
@@ -276,13 +276,13 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Fetch changes from the remote repository </summary>
 		private static void OnPressFetch() {
 			Debug.Log("Fetching all");
-			var output = GitNity.ExecuteProcessTerminal("fetch --all", "git");
+			var output = Versionator.ExecuteProcessTerminal("fetch --all", "git");
 			Debug.Log("Fetch output: " + output.result);
 		}
 
 		/// <summary> Commit staged changes </summary>
 		private static void OnPressCommitSelected() {
-			var filesSelected = GitNity.filesStatus.FindAll(f => f.isSelected).ToArray();
+			var filesSelected = Versionator.filesStatus.FindAll(f => f.isSelected).ToArray();
 			var filesPath = new string[filesSelected.Length];
 
 			for (int i = 0; i < filesSelected.Length; i++) {
@@ -290,13 +290,13 @@ namespace Plugins.GitNity.Editor.Tabs
 			}
 
 			// Stage files
-			bool added = GitNity.AddFilesToStage(filesSelected);
+			bool added = Versionator.AddFilesToStage(filesSelected);
 
 			if (!added)
 				return;
 
 			// Commit
-			var commited = GitNity.CommitStagedFiles(textFieldCommit.value);
+			var commited = Versionator.CommitStagedFiles(textFieldCommit.value);
 
 			if (!commited)
 				return;
@@ -307,7 +307,7 @@ namespace Plugins.GitNity.Editor.Tabs
 
 		/// <summary> Push staged commits to the remote repository </summary>
 		private static void PushCommits() {
-			if (!GitNity.PushCommits())
+			if (!Versionator.PushCommits())
 				return;
 
 			RefreshTemplate();
@@ -315,9 +315,9 @@ namespace Plugins.GitNity.Editor.Tabs
 
 		/// <summary> Repaint template </summary>
 		private static void RefreshTemplate() {
-			GitNity.RefreshFilesStatus();
+			Versionator.RefreshFilesStatus();
 			LoadData();
-			listViewContainer.itemsSource = GitNity.filesStatus;
+			listViewContainer.itemsSource = Versionator.filesStatus;
 			listViewContainer.Rebuild();
 			UpdateElementsBySelections();
 			RefreshPullButton();
@@ -329,10 +329,10 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Toggle a file from the list </summary>
 		/// <param name="idx">idx of the file</param>
 		private static void OnClickFileToggle(int idx) {
-			var gitFileStatus = GitNity.filesStatus[idx];
+			var gitFileStatus = Versionator.filesStatus[idx];
 			gitFileStatus.isSelected = !gitFileStatus.isSelected;
 
-			GitNity.filesStatus[idx] = gitFileStatus;
+			Versionator.filesStatus[idx] = gitFileStatus;
 
 			listViewContainer.RefreshItem(idx);
 
@@ -347,9 +347,9 @@ namespace Plugins.GitNity.Editor.Tabs
 		}
 
 		/// <summary> Context menu, open selected file in the explorer </summary>
-		/// <param name="idx">Idx of the GitNity.filesStatus</param>
+		/// <param name="idx">Idx of the Versionator3k.filesStatus</param>
 		private static void ShowInExplorer(int idx) {
-			var fileStatus = GitNity.filesStatus[idx];
+			var fileStatus = Versionator.filesStatus[idx];
 
 			Debug.Log("Opening file at path: " + fileStatus.GetFullPath());
 			EditorUtility.RevealInFinder(fileStatus.path);
@@ -358,7 +358,7 @@ namespace Plugins.GitNity.Editor.Tabs
 		/// <summary> Focus file in the editor project window </summary>
 		private static void PingFile(DropdownMenuAction aStatus) {
 			var idx = (int) aStatus.userData;
-			var gitFileStatus = GitNity.filesStatus[idx];
+			var gitFileStatus = Versionator.filesStatus[idx];
 			EditorGUIUtility.PingObject(EditorGUIUtility.Load(gitFileStatus.path));
 		}
 
@@ -381,7 +381,7 @@ namespace Plugins.GitNity.Editor.Tabs
 			var files = new GitFileStatus[selectedIndices.Count];
 
 			for (var i = 0; i < selectedIndices.Count; i++) {
-				files[i] = GitNity.filesStatus[selectedIndices[i]];
+				files[i] = Versionator.filesStatus[selectedIndices[i]];
 			}
 
 			string msg =
@@ -391,7 +391,7 @@ namespace Plugins.GitNity.Editor.Tabs
 			if (!revert)
 				return;
 
-			if (GitNity.RevertFiles(files))
+			if (Versionator.RevertFiles(files))
 				RefreshTemplate();
 		}
 		#endregion

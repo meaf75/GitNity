@@ -72,7 +72,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-##### GitNity CUSTOM #####
+##### Versionator3k CUSTOM #####
 .idea
 .vscode
 node_modules

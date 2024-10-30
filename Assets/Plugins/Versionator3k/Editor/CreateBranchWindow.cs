@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
     public class CreateBranchWindow : EditorWindow {
     
@@ -61,19 +61,19 @@ namespace Plugins.GitNity.Editor
         /// <summary> Run command and create new a branch </summary>
         private void OnClickCreate() {
             // Check if branch exist
-            if (GitNity.BranchExist(BranchName)) {
+            if (Versionator.BranchExist(BranchName)) {
                 EditorUtility.DisplayDialog("Error branch exist", $"Branch \"{BranchName}\" already exist", "Ok");
                 return;
             }
             
             // Create branch
-            var created = GitNity.CreateBranch(BranchName, Branches[SelectedFromBranchIdx], SwitchToBranch);
+            var created = Versionator.CreateBranch(BranchName, Branches[SelectedFromBranchIdx], SwitchToBranch);
             
             if(!created)
                 return;
          
-            var gitNityWindow = GetWindow<GitNityWindow>(typeof(GitNityWindow));
-            gitNityWindow.DrawWindow(true);  // Update parent 
+            var versionator3kWindow = GetWindow<Versionator3kWindow>(typeof(Versionator3kWindow));
+            versionator3kWindow.DrawWindow(true);  // Update parent 
             
             EditorUtility.DisplayDialog("Success", $"Branch \"{BranchName}\" created, switched: {SwitchToBranch}", "Ok");
             Close();

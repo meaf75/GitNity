@@ -3,11 +3,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor
+namespace Plugins.Versionator3k.Editor
 {
     public class TabGitCommits : MonoBehaviour
     {
-        // UG prefix of GitNity
+        // UG prefix of Versionator3k
         public struct UGCommit
         {
             public string longCommitHash;
@@ -27,22 +27,22 @@ namespace Plugins.GitNity.Editor
         private static DropdownField dropdownBranches;
 
         /// <summary> Render Commits tab on given container </summary>
-        /// <param name="gitNityWindow">editor window</param>
-        /// <param name="container">GitNity window container</param>
+        /// <param name="versionator3kWindow">editor window</param>
+        /// <param name="container">Versionator3k window container</param>
         /// <returns></returns>
-        public static VisualElement RenderTemplate(GitNityWindow gitNityWindow, VisualElement container)
+        public static VisualElement RenderTemplate(Versionator3kWindow versionator3kWindow, VisualElement container)
         {
             var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                $"{GitNity.GetPluginPath(gitNityWindow)}/Templates/TabCommits.uxml");
+                $"{Versionator.GetPluginPath(versionator3kWindow)}/Templates/TabCommits.uxml");
             var Template = UIAsset.Instantiate();
             container.Add(Template);
 
             RegisterElements(Template);
 
-            dropdownBranches.choices = GitNity.branches;
-            dropdownBranches.SetValueWithoutNotify(GitNity.currentBranchName);
+            dropdownBranches.choices = Versionator.branches;
+            dropdownBranches.SetValueWithoutNotify(Versionator.currentBranchName);
 
-            SetupTemplateElements(LoadData(GitNity.branches[GitNity.currentBranchOptionIdx]));
+            SetupTemplateElements(LoadData(Versionator.branches[Versionator.currentBranchOptionIdx]));
 
             return Template;
         }
@@ -58,7 +58,7 @@ namespace Plugins.GitNity.Editor
         /// <summary> Load required data to render this visual element </summary>
         private static Data LoadData(string branchName)
         {
-            var commitsExec = GitNity.ExecuteProcessTerminal($"log --format=\"%H #UG# %h #UG# %an #UG# %ae #UG# %ai #UG# %s\" --max-count=301 --date-order {branchName} --", "git");
+            var commitsExec = Versionator.ExecuteProcessTerminal($"log --format=\"%H #UG# %h #UG# %an #UG# %ae #UG# %ai #UG# %s\" --max-count=301 --date-order {branchName} --", "git");
 
             var commitsInfo = commitsExec.result.Split("\n");
 
@@ -86,10 +86,10 @@ namespace Plugins.GitNity.Editor
         private static void SetupTemplateElements(Data data)
         {
             listViewCommits.fixedItemHeight = 16;
-            listViewCommits.makeItem = GitNityCommitTemplate.MakeItem;
+            listViewCommits.makeItem = Versionator3kCommitTemplate.MakeItem;
             listViewCommits.bindItem = (e, i) =>
             {
-                GitNityCommitTemplate.BindItem(e, data.Commits[i]);
+                Versionator3kCommitTemplate.BindItem(e, data.Commits[i]);
             };
             listViewCommits.itemsSource = data.Commits;
 

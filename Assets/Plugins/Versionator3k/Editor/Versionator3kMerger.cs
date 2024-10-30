@@ -2,17 +2,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.GitNity.Editor {
+namespace Plugins.Versionator3k.Editor {
     /// <summary>
     /// TODO: should I make a merger or just open the asset with the user script editor?
     /// </summary>
-    public class GitNityMerger : EditorWindow
+    public class Versionator3kMerger : EditorWindow
     {
-        // [MenuItem("Tools/GitNity/GitNity window")]
+        // [MenuItem("Tools/Versionator3k/Versionator3k window")]
         public static void ShowExample()
         {
-            GitNityMerger wnd = GetWindow<GitNityMerger>();
-            wnd.titleContent = new GUIContent("GitNityMerger");
+            Versionator3kMerger wnd = GetWindow<Versionator3kMerger>();
+            wnd.titleContent = new GUIContent("Versionator3kMerger");
         }
 
         public void CreateGUI()
@@ -25,7 +25,7 @@ namespace Plugins.GitNity.Editor {
             root.Add(label);
 
             // Import UXML
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/GitNity/Editor/GitNityMerger.uxml");
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/Versionator3k/Editor/Versionator3kMerger.uxml");
             VisualElement labelFromUXML = visualTree.Instantiate();
             root.Add(labelFromUXML);
         }
