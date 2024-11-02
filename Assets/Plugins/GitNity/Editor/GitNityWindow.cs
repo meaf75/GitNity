@@ -16,7 +16,8 @@ namespace Plugins.GitNity.Editor
 
 		// Icons: https://github.com/halak/unity-editor-icons
 
-		private static GitNityWindow window;
+		public static GitNityWindow window;
+		
 		private VisualElement currentTabTemplate;
 
 
@@ -36,6 +37,7 @@ namespace Plugins.GitNity.Editor
 		}
 	
 		private void OnEnable() {
+			window = this;
             DrawWindow(true);
 		}
 
