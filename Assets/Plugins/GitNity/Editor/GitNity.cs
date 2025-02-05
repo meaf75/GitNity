@@ -81,7 +81,7 @@ namespace Plugins.GitNity.Editor
         public static Dictionary<string, bool> cachedIgnoredPaths;
 
         /// <summary> List of patterns/files/folders ignored by the user </summary>
-        private static string[] ignoredPatterns = new string[0];
+        private static string[] ignoredPatterns = Array.Empty<string>();
 
         public static int currentBranchOptionIdx;
         public static int newBranchOptionIdx;
@@ -139,7 +139,7 @@ namespace Plugins.GitNity.Editor
                 } else {
                     bool isIgnored = false;
                     foreach (string pattern in ignoredPatterns){
-                        if (new Regex(pattern).IsMatch(assetPath)) {
+                        if (Regex.IsMatch(assetPath, pattern)) {
                             isIgnored = true;
                             break;
                         }
@@ -252,6 +252,7 @@ namespace Plugins.GitNity.Editor
                 return;
             }
 
+            var leadingSlash = new Regex("/");
             var gitIgnoreFile = await File.ReadAllLinesAsync(RootGitIgnoreFilePath);
             ignoredPatterns = Array.FindAll(gitIgnoreFile, line => !line.StartsWith("#") && line.Trim().Length > 0 && line.Trim() != "\n");
             cachedIgnoredPaths.Clear();
@@ -259,6 +260,21 @@ namespace Plugins.GitNity.Editor
             for (int i = 0; i < ignoredPatterns.Length; i++)            {
                 if (ignoredPatterns[i].StartsWith("*")){
                     ignoredPatterns[i] = $".{ignoredPatterns[i]}";
+                }
+                
+                // Remove leading slash of the pattern
+                if (ignoredPatterns[i].StartsWith("/")) {
+                    ignoredPatterns[i] = leadingSlash.Replace(ignoredPatterns[i], "", 1);
+                }
+                
+                // Fix for directories
+                if (ignoredPatterns[i].Contains("**")) {
+                    ignoredPatterns[i] = ignoredPatterns[i].Replace("**", ".+");
+                }
+
+                // Check if pattern is for a file
+                if (ignoredPatterns[i].Contains("/*.")) {
+                    ignoredPatterns[i] = ignoredPatterns[i].Replace("/*.", "\\.") + "$";
                 }
             }
         }
