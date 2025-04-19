@@ -2,7 +2,6 @@ using Plugins.GitNity.Editor.Tabs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
 
 // Icons from https://icons8.com/
 namespace Plugins.GitNity.Editor

@@ -1,0 +1,3 @@
+#textfield-commit #unity-text-input {
+    align-self: stretch;
+}
