@@ -68,7 +68,7 @@ namespace Plugins.Versionator3k.Editor.Tabs
 			}
 		
 			// Get non pushed commits
-			var nonPushedCommitsExec = Versionator.ExecuteProcessTerminal( "log --branches --not --remotes --oneline", "git");
+			var nonPushedCommitsExec = GitNity.ExecuteProcessTerminal($"log {GitNity.currentBranchName} --not --remotes --oneline", "git");
 			var localCommits = nonPushedCommitsExec.result.Split("\n");
             
 			// Fill non pushed commits

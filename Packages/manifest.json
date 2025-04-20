@@ -1,7 +1,6 @@
 {
   "dependencies": {
-    "com.unity.ide.rider": "3.0.26",
-    "com.unity.ide.vscode": "1.2.5",
+    "com.unity.ide.rider": "3.0.36",
     "com.unity.ugui": "1.0.0",
     "com.unity.modules.imageconversion": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",

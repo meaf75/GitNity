@@ -8,31 +8,27 @@ namespace Plugins.Versionator3k.Editor {
 		static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
 		{
 
-			if (didDomainReload)
-			{
-				// Do nothing, files status will be refreshed from the Versionator3k constructor on domain reload
+			if (didDomainReload) {
+				// Do nothing, files status will be refreshed from the GitNity constructor on domain reload
 				return;
 			}
 
-			foreach (string str in importedAssets)
-			{
-				if (str.EndsWith(".cs"))    // If is a c# file then the Versionator3k constructor on domain reload will refresh the data
+			foreach (string str in importedAssets) {
+				if (str.EndsWith(".cs"))    // If is a c# file then the GitNity constructor on domain reload will refresh the data
 					return;
 
 				Debug.Log("Reimported Asset: " + str);
 			}
 
-			foreach (string str in deletedAssets)
-			{
-				if (str.EndsWith(".cs"))    // If is a c# file then the Versionator3k constructor on domain reload will refresh the data
+			foreach (string str in deletedAssets) {
+				if (str.EndsWith(".cs"))    // If is a c# file then the GitNity constructor on domain reload will refresh the data
 					return;
 
 				Debug.Log("Deleted Asset: " + str);
 			}
 
-			for (int i = 0; i < movedAssets.Length; i++)
-			{
-				if (movedAssets[i].EndsWith(".cs")) // If is a c# file then the Versionator3k constructor on domain reload will refresh the data
+			for (int i = 0; i < movedAssets.Length; i++) {
+				if (movedAssets[i].EndsWith(".cs")) // If is a c# file then the GitNity constructor on domain reload will refresh the data
 					return;
 
 				string guid = AssetDatabase.AssetPathToGUID(movedAssets[i]);
@@ -46,9 +42,8 @@ namespace Plugins.Versionator3k.Editor {
 			Versionator.RefreshFilesStatus();
 
 			// Refresh window
-			if (EditorWindow.HasOpenInstances<Versionator3kWindow>())
-			{
-				EditorWindow.GetWindow<Versionator3kWindow>().DrawWindow(false);
+			if (GitNityWindow.window) {
+				GitNityWindow.window.DrawWindow(false);
 			}
 		}
 	}

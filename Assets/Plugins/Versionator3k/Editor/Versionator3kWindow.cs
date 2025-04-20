@@ -2,7 +2,6 @@ using Plugins.Versionator3k.Editor.Tabs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
 
 // Icons from https://icons8.com/
 namespace Plugins.Versionator3k.Editor
@@ -36,6 +35,7 @@ namespace Plugins.Versionator3k.Editor
 		}
 	
 		private void OnEnable() {
+			window = this;
             DrawWindow(true);
 		}
 

@@ -1,7 +1,7 @@
 {
-  "name": "com.meaf75.versionator3k",
-  "displayName": "Versionator3k",
-  "version": "0.1.2",
+  "name": "com.meaf75.versionator",
+  "displayName": "Versionator",
+  "version": "0.1.6",
   "unity": "2021.3",
   "description": "Git integration for Unity projects, all basic tools inside the editor",
   "keywords": [
