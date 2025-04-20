@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/Plugins/GitNity/Templates/USS/TabGitChanges.uss?fileID=7433441132597879392&amp;guid=fe1b82b4a2189d344a17870eff0a9d31&amp;type=3#TabGitChanges" />
+    <Style src="project://database/Packages/com.meaf75.versionator/Templates/USS/TabGitChanges.uss?fileID=7433441132597879392&amp;guid=fe1b82b4a2189d344a17870eff0a9d31&amp;type=3#TabGitChanges" />
     <ui:VisualElement name="commit-message-container" style="flex-shrink: 0;">
         <ui:Label text="Message:" display-tooltip-when-elided="true" style="margin-left: 4px; margin-top: 5px; margin-bottom: 2px;" />
         <ui:TextField picking-mode="Ignore" multiline="true" max-length="-1" name="textfield-commit" style="height: 78px;" />

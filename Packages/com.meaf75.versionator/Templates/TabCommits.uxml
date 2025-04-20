@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Plugins/Versionator/Templates/USS/CommitElement.uss?fileID=7433441132597879392&amp;guid=684639ae8d6b3aa47bbe388b83794b32&amp;type=3#CommitElement" />
+    <Style src="project://database/Packages/com.meaf75.versionator/Templates/USS/CommitElement.uss?fileID=7433441132597879392&amp;guid=684639ae8d6b3aa47bbe388b83794b32&amp;type=3#CommitElement" />
     <ui:VisualElement>
         <ui:VisualElement style="flex-direction: row; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; min-height: 45px;">
             <ui:Label text="Show commits from:" display-tooltip-when-elided="true" />
