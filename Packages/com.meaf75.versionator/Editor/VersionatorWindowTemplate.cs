@@ -1,7 +1,7 @@
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor {
-    public static class Versionator3kWindowTemplate
+namespace Versionator.Editor {
+    public static class VersionatorWindowTemplate
     {
         public static Label labelBranch;
         public static VisualElement tabContent;

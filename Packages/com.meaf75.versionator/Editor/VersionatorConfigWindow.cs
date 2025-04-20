@@ -3,7 +3,7 @@ using System.Net;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
     /// <summary> Config if the local repository </summary>
     public static class GitConfig {
@@ -34,7 +34,7 @@ namespace Plugins.Versionator3k.Editor
     }
     
     /// <summary> Window to facilitate the interaction with git </summary>
-    public class Versionator3kConfigWindow : EditorWindow, IHasCustomMenu {
+    public class VersionatorConfigWindow : EditorWindow, IHasCustomMenu {
     
         private string userName;
         private string userEmail;
@@ -46,12 +46,12 @@ namespace Plugins.Versionator3k.Editor
 
         private Vector3 scrollPos;
     
-        [MenuItem("Tools/Versionator3k/Versionator3k Config")]
+        [MenuItem("Tools/Versionator/Versionator Config")]
         public static void Init() {
-            // var wnd = GetWindowWithRect<Versionator3kConfigWindow>(new Rect(0, 0, 527, 155));
-            var wnd = GetWindow<Versionator3kConfigWindow>();
+            // var wnd = GetWindowWithRect<VersionatorConfigWindow>(new Rect(0, 0, 527, 155));
+            var wnd = GetWindow<VersionatorConfigWindow>();
         
-            wnd.titleContent = new GUIContent("Versionator3k Config");
+            wnd.titleContent = new GUIContent("Versionator Config");
         }
     
         // This interface implementation is automatically called by Unity.
@@ -70,7 +70,7 @@ namespace Plugins.Versionator3k.Editor
         }
 
         private void OpenGitnityWindow() {
-            Versionator3kWindow.Init();
+            VersionatorWindow.Init();
         }
 
         private void OnGUI() {
@@ -80,7 +80,7 @@ namespace Plugins.Versionator3k.Editor
             bool warningsActive = false;
         
             if(!hasGitInstalled) {
-                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use Versionator3k, https://git-scm.com/download", MessageType.Error);
+                EditorGUILayout.HelpBox("\"git\" was not detected on the system path, please install it before use Versionator, https://git-scm.com/download", MessageType.Error);
                 return;
             }
 

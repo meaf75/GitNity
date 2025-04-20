@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
-	public static class Versionator3kCommitTemplate
+	public static class VersionatorCommitTemplate
 	{
 	
 		private struct Elements {
@@ -31,7 +31,7 @@ namespace Plugins.Versionator3k.Editor
 	
 		private static VisualTreeAsset GetTemplate() {
 			if(!template)
-				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/{nameof(Versionator3kCommitTemplate)}.uxml");
+				template = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/{nameof(VersionatorCommitTemplate)}.uxml");
 
 			return template;
 		}

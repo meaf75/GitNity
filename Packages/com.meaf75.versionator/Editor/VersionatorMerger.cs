@@ -2,17 +2,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor {
+namespace Versionator.Editor {
     /// <summary>
     /// TODO: should I make a merger or just open the asset with the user script editor?
     /// </summary>
-    public class Versionator3kMerger : EditorWindow
+    public class VersionatorMerger : EditorWindow
     {
-        // [MenuItem("Tools/Versionator3k/Versionator3k window")]
+        // [MenuItem("Tools/Versionator/Versionator window")]
         public static void ShowExample()
         {
-            Versionator3kMerger wnd = GetWindow<Versionator3kMerger>();
-            wnd.titleContent = new GUIContent("Versionator3kMerger");
+            VersionatorMerger wnd = GetWindow<VersionatorMerger>();
+            wnd.titleContent = new GUIContent("VersionatorMerger");
         }
 
         public void CreateGUI()
@@ -25,7 +25,7 @@ namespace Plugins.Versionator3k.Editor {
             root.Add(label);
 
             // Import UXML
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/Versionator3k/Editor/Versionator3kMerger.uxml");
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Plugins/Versionator/Editor/VersionatorMerger.uxml");
             VisualElement labelFromUXML = visualTree.Instantiate();
             root.Add(labelFromUXML);
         }

@@ -1,8 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.Versionator3k.Editor {
-	public class Versionator3kPostprocessor : AssetPostprocessor
+namespace Versionator.Editor {
+	public class VersionatorPostprocessor : AssetPostprocessor
 	{
 		/// <summary>Called from unity</summary>
 		static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
@@ -42,8 +42,8 @@ namespace Plugins.Versionator3k.Editor {
 			Versionator.RefreshFilesStatus();
 
 			// Refresh window
-			if (GitNityWindow.window) {
-				GitNityWindow.window.DrawWindow(false);
+			if (VersionatorWindow.window) {
+				VersionatorWindow.window.DrawWindow(false);
 			}
 		}
 	}

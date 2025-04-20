@@ -1,7 +1,6 @@
 import webp from "webp-converter"
 import {readdirSync, unlinkSync} from "fs"
-import { exit } from "process"
-import path, { basename, dirname, join } from "path"
+import { dirname, join } from "path"
 import { fileURLToPath } from "url";
 
 

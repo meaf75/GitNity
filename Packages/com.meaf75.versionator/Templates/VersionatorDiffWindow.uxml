@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Plugins/Versionator3k/Templates/USS/Versionator3kDiffWindow.uss?fileID=7433441132597879392&amp;guid=d032dcfd35549864486dd833823cc6fe&amp;type=3#Versionator3kDiffWindow" />
+    <Style src="project://database/Assets/Plugins/Versionator/Templates/USS/VersionatorDiffWindow.uss?fileID=7433441132597879392&amp;guid=d032dcfd35549864486dd833823cc6fe&amp;type=3#VersionatorDiffWindow" />
     <ui:VisualElement style="margin-bottom: 15px; flex-direction: row; margin-top: 5px; margin-left: 5px;">
         <ui:Label text="Viewing file: " display-tooltip-when-elided="true" />
-        <ui:Label text="Assets/Plugins/Versionator3k/Versionator3k.cs" name="label-file-name" />
+        <ui:Label text="Assets/Plugins/Versionator/Versionator.cs" name="label-file-name" />
     </ui:VisualElement>
     <ui:ListView focusable="true" name="list-view-lines" horizontal-scrolling="true" style="background-color: rgb(63, 63, 63);" />
 </ui:UXML>

@@ -3,11 +3,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
     public class TabGitCommits : MonoBehaviour
     {
-        // UG prefix of Versionator3k
+        // UG prefix of Versionator
         public struct UGCommit
         {
             public string longCommitHash;
@@ -27,13 +27,13 @@ namespace Plugins.Versionator3k.Editor
         private static DropdownField dropdownBranches;
 
         /// <summary> Render Commits tab on given container </summary>
-        /// <param name="versionator3kWindow">editor window</param>
-        /// <param name="container">Versionator3k window container</param>
+        /// <param name="versionatorWindow">editor window</param>
+        /// <param name="container">Versionator window container</param>
         /// <returns></returns>
-        public static VisualElement RenderTemplate(Versionator3kWindow versionator3kWindow, VisualElement container)
+        public static VisualElement RenderTemplate(VersionatorWindow versionatorWindow, VisualElement container)
         {
             var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                $"{Versionator.GetPluginPath(versionator3kWindow)}/Templates/TabCommits.uxml");
+                $"{Versionator.GetPluginPath(versionatorWindow)}/Templates/TabCommits.uxml");
             var Template = UIAsset.Instantiate();
             container.Add(Template);
 
@@ -86,10 +86,10 @@ namespace Plugins.Versionator3k.Editor
         private static void SetupTemplateElements(Data data)
         {
             listViewCommits.fixedItemHeight = 16;
-            listViewCommits.makeItem = Versionator3kCommitTemplate.MakeItem;
+            listViewCommits.makeItem = VersionatorCommitTemplate.MakeItem;
             listViewCommits.bindItem = (e, i) =>
             {
-                Versionator3kCommitTemplate.BindItem(e, data.Commits[i]);
+                VersionatorCommitTemplate.BindItem(e, data.Commits[i]);
             };
             listViewCommits.itemsSource = data.Commits;
 

@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor.Tabs
+namespace Versionator.Editor.Tabs
 {
 	public static class TabGitChangesTemplate {
 
@@ -31,12 +31,12 @@ namespace Plugins.Versionator3k.Editor.Tabs
 		private const string texfieldCommitId = "textfield-commit";
 
         /// <summary> Add Visual element to given container </summary>
-        /// <param name="versionator3kWindow">parent window</param>
+        /// <param name="versionatorWindow">parent window</param>
         /// <param name="container">where to add this visual element</param>
         /// <returns></returns>
-        public static VisualElement RenderTemplate(Versionator3kWindow versionator3kWindow, VisualElement container) {
+        public static VisualElement RenderTemplate(VersionatorWindow versionatorWindow, VisualElement container) {
 			var UIAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-				$"{Versionator.GetPluginPath(versionator3kWindow)}/Templates/TabGitChanges.uxml");
+				$"{Versionator.GetPluginPath(versionatorWindow)}/Templates/TabGitChanges.uxml");
 			var template = UIAsset.Instantiate();
 			container.Add(template);
 
@@ -68,7 +68,7 @@ namespace Plugins.Versionator3k.Editor.Tabs
 			}
 		
 			// Get non pushed commits
-			var nonPushedCommitsExec = GitNity.ExecuteProcessTerminal($"log {GitNity.currentBranchName} --not --remotes --oneline", "git");
+			var nonPushedCommitsExec = Versionator.ExecuteProcessTerminal($"log {Versionator.currentBranchName} --not --remotes --oneline", "git");
 			var localCommits = nonPushedCommitsExec.result.Split("\n");
             
 			// Fill non pushed commits
@@ -211,12 +211,12 @@ namespace Plugins.Versionator3k.Editor.Tabs
 			buttonCommitSelected.SetEnabled(selectedCount > 0);
 
 			// Hide/Display button push
-			if (buttonPushCommits.ClassListContains(Versionator3kWindow.Classes.DisplayNoneClass)) {
-				buttonPushCommits.RemoveFromClassList(Versionator3kWindow.Classes.DisplayNoneClass);
+			if (buttonPushCommits.ClassListContains(VersionatorWindow.Classes.DisplayNoneClass)) {
+				buttonPushCommits.RemoveFromClassList(VersionatorWindow.Classes.DisplayNoneClass);
 			}
 
 			if (nonPushedCommits.Count == 0) {
-				buttonPushCommits.AddToClassList(Versionator3kWindow.Classes.DisplayNoneClass);
+				buttonPushCommits.AddToClassList(VersionatorWindow.Classes.DisplayNoneClass);
 			} else {
 				buttonPushCommits.text = $"Push commits ({nonPushedCommits.Count})";
 				buttonPushCommits.tooltip = $"You have {nonPushedCommits.Count} commits without push";
@@ -347,7 +347,7 @@ namespace Plugins.Versionator3k.Editor.Tabs
 		}
 
 		/// <summary> Context menu, open selected file in the explorer </summary>
-		/// <param name="idx">Idx of the Versionator3k.filesStatus</param>
+		/// <param name="idx">Idx of the Versionator.filesStatus</param>
 		private static void ShowInExplorer(int idx) {
 			var fileStatus = Versionator.filesStatus[idx];
 

@@ -5,9 +5,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
-    public class Versionator3kDiffWindow : EditorWindow {
+    public class VersionatorDiffWindow : EditorWindow {
 
         enum TextType {
             NONE, JUMPLINE, ADD, REMOVE        
@@ -17,6 +17,7 @@ namespace Plugins.Versionator3k.Editor
             public const string HORIZONTAL_CONTAINER = "horizontal-container";
             public const string TEXT_REMOVED = "text-removed";
             public const string TEXT_ADDED = "text-added";
+            public const string MODIFIED_LINE = "modified-line";
         }
 
         /// <summary> Defines the parts of a line parsed from the git diff </summary>
@@ -42,9 +43,9 @@ namespace Plugins.Versionator3k.Editor
             rootVisualElement.Clear();
         
             // Import UXML template
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.GetPluginPath(this)}/Templates/Versionator3kDiffWindow.uxml");
-            VisualElement labelFromUXML = visualTree.Instantiate();
-            rootVisualElement.Add(labelFromUXML);
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.GetPluginPath(this)}/Templates/VersionatorDiffWindow.uxml");
+            VisualElement labelFromUxml = visualTree.Instantiate();
+            rootVisualElement.Add(labelFromUxml);
         
             QueryElements();
         
@@ -143,6 +144,8 @@ namespace Plugins.Versionator3k.Editor
                 element.Clear();
                 LineInfo line = fileLines[i];
 
+                bool modified = false;
+
                 for (var t = 0; t < line.texts.Count; t++) {
                     var label = new Label {
                         text = line.texts[t],
@@ -151,13 +154,22 @@ namespace Plugins.Versionator3k.Editor
 
                     if (line.types[t] == TextType.ADD) {
                         label.AddToClassList(Styles.TEXT_ADDED);
+                        modified = true;
                     }
                     if (line.types[t] == TextType.REMOVE) {
+                        modified = true;
                         label.AddToClassList(Styles.TEXT_REMOVED);
                     }
                 
                     element.Add(label);
                 }
+
+                if (modified) {
+                    element.AddToClassList(Styles.MODIFIED_LINE);
+                } else {
+                    element.RemoveFromClassList(Styles.MODIFIED_LINE);
+                }
+                
             };
         
             listView.itemsSource = fileLines;

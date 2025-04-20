@@ -1,12 +1,13 @@
-using Plugins.Versionator3k.Editor.Tabs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Versionator.Editor.Tabs;
 
 // Icons from https://icons8.com/
-namespace Plugins.Versionator3k.Editor
+
+namespace Versionator.Editor
 {
-	public class Versionator3kWindow : EditorWindow, IHasCustomMenu {
+	public class VersionatorWindow : EditorWindow, IHasCustomMenu {
 		public static class Classes {
 			public const string SelectedTabClass = "selected-tab";
 			public const string DisplayNoneClass = "display-none";
@@ -15,20 +16,20 @@ namespace Plugins.Versionator3k.Editor
 
 		// Icons: https://github.com/halak/unity-editor-icons
 
-		private static Versionator3kWindow window;
+		public static VersionatorWindow window;
 		private VisualElement currentTabTemplate;
 
 
         private int currentTab;
 	
-		[MenuItem("Tools/Versionator3k/Versionator3k window")]
+		[MenuItem("Tools/Versionator/Versionator window")]
 		public static void Init(){
-			window = GetWindow<Versionator3kWindow>(typeof(Versionator3kWindow));
+			window = GetWindow<VersionatorWindow>(typeof(VersionatorWindow));
 
 			// Loads an icon from an image stored at the specified path
 			Texture icon = AssetDatabase.LoadAssetAtPath<Texture> ($"{Versionator.GetPluginPath(window)}/Icons/icons8-git-48.png");
 			// Create the instance of GUIContent to assign to the window. Gives the title "RBSettings" and the icon
-			GUIContent titleContent = new GUIContent ("Versionator3k", icon);
+			GUIContent titleContent = new GUIContent ("Versionator", icon);
 		
 			window.titleContent = titleContent;
 			window.minSize = new Vector2(640, 286);
@@ -48,7 +49,7 @@ namespace Plugins.Versionator3k.Editor
         }
 
         void OpenToolsWindow() {
-            Versionator3kConfigWindow.Init();
+            VersionatorConfigWindow.Init();
         }
 
         private void OnLostFocus() {
@@ -69,28 +70,28 @@ namespace Plugins.Versionator3k.Editor
 				Versionator.LoadData(this);
 			}
 		
-			VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/Versionator3kWindow.uxml");
+			VisualTreeAsset uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{Versionator.pluginPath}/Templates/VersionatorWindow.uxml");
 			var TemplateContainer = uiAsset.Instantiate();
 			TemplateContainer.AddToClassList(Classes.FullHeightClass);
 		
 			rootVisualElement.Clear();
 			rootVisualElement.Add(TemplateContainer);
 		
-			Versionator3kWindowTemplate.RegisterElements(rootVisualElement);
+			VersionatorWindowTemplate.RegisterElements(rootVisualElement);
 		
 			// Setup callbacks
-			foreach (var tab in Versionator3kWindowTemplate.tabs) {
+			foreach (var tab in VersionatorWindowTemplate.tabs) {
 				tab.RegisterCallback<ClickEvent>(OnPressTab);
 			}
 		
 			// Header
-			Versionator3kWindowTemplate.labelBranch.text = Versionator.currentBranchName;
+			VersionatorWindowTemplate.labelBranch.text = Versionator.currentBranchName;
 			Versionator.currentBranchOptionIdx = Versionator.branches.IndexOf(Versionator.currentBranchName);
-			Versionator3kWindowTemplate.dropdownBranches.index = Versionator.currentBranchOptionIdx;
-			Versionator3kWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
-			Versionator3kWindowTemplate.dropdownBranches.choices = Versionator.branches;
-			Versionator3kWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
-			Versionator3kWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => {
+			VersionatorWindowTemplate.dropdownBranches.index = Versionator.currentBranchOptionIdx;
+			VersionatorWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
+			VersionatorWindowTemplate.dropdownBranches.choices = Versionator.branches;
+			VersionatorWindowTemplate.dropdownBranches.RegisterValueChangedCallback(OnChangeDropdownOptionValue);
+			VersionatorWindowTemplate.refreshButton.RegisterCallback<ClickEvent>(_ => {
                 Versionator.ProcessIgnoredFiles();
                 Versionator.RefreshFilesStatus();
 				DrawWindow(true);
@@ -107,7 +108,7 @@ namespace Plugins.Versionator3k.Editor
 				EditorGUILayout.HelpBox("Current project seems to not be a git repository", MessageType.Warning);
 
 				if (GUILayout.Button("Initialize repository")) {
-					Versionator3kConfigWindow.Init();	
+					VersionatorConfigWindow.Init();	
 				}
 			}
 		}
@@ -117,10 +118,10 @@ namespace Plugins.Versionator3k.Editor
 				return;
 			}
 		
-			Versionator3kWindowTemplate.tabs[currentTab].RemoveFromClassList(Classes.SelectedTabClass);
+			VersionatorWindowTemplate.tabs[currentTab].RemoveFromClassList(Classes.SelectedTabClass);
 
 			currentTab = ((Button) evt.currentTarget).tabIndex;
-			Versionator3kWindowTemplate.tabs[currentTab].AddToClassList(Classes.SelectedTabClass);
+			VersionatorWindowTemplate.tabs[currentTab].AddToClassList(Classes.SelectedTabClass);
 
 			LoadTab(currentTab);
 		}
@@ -128,12 +129,12 @@ namespace Plugins.Versionator3k.Editor
 		/// <summary> Load selected tab (changes/commits) </summary>
 		/// <param name="tabIdx">idx of the tab</param>
 		private void LoadTab(int tabIdx) {			
-			Versionator3kWindowTemplate.tabContent.Clear();
+			VersionatorWindowTemplate.tabContent.Clear();
 		
 			if (tabIdx == 0) {
-                currentTabTemplate = TabGitChangesTemplate.RenderTemplate(this,Versionator3kWindowTemplate.tabContent);
+                currentTabTemplate = TabGitChangesTemplate.RenderTemplate(this,VersionatorWindowTemplate.tabContent);
 			} else {
-                currentTabTemplate = TabGitCommits.RenderTemplate(this,Versionator3kWindowTemplate.tabContent);
+                currentTabTemplate = TabGitCommits.RenderTemplate(this,VersionatorWindowTemplate.tabContent);
 			}
 
             currentTabTemplate.AddToClassList(Classes.FullHeightClass);
@@ -142,30 +143,30 @@ namespace Plugins.Versionator3k.Editor
 		/// <summary> Bound to the branches drop down </summary>
 		private void OnChangeDropdownOptionValue(ChangeEvent<string> evt) {
 
-			if (Versionator3kWindowTemplate.dropdownBranches.index == Versionator.currentBranchOptionIdx) {
+			if (VersionatorWindowTemplate.dropdownBranches.index == Versionator.currentBranchOptionIdx) {
 				return;
 			}
 		
 			// For create branch
-			if (Versionator3kWindowTemplate.dropdownBranches.index == Versionator.newBranchOptionIdx) {
+			if (VersionatorWindowTemplate.dropdownBranches.index == Versionator.newBranchOptionIdx) {
 				CreateBranchWindow.OpenPopUp(Versionator.currentBranchName, Versionator.branches);
-				Versionator3kWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
+				VersionatorWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
 				return;
 			}
 
 			// For switch into a branch
-			bool switched = Versionator.SwitchToBranch(Versionator3kWindowTemplate.dropdownBranches.index);
+			bool switched = Versionator.SwitchToBranch(VersionatorWindowTemplate.dropdownBranches.index);
 
 			if (!switched) {
 				EditorUtility.DisplayDialog("Error switching branch",
-					$"An error ocurred trying to change into the {Versionator.branches[Versionator3kWindowTemplate.dropdownBranches.index]} branch, please check the warning logs",
+					$"An error ocurred trying to change into the {Versionator.branches[VersionatorWindowTemplate.dropdownBranches.index]} branch, please check the warning logs",
 					"ok");
 			
-				Versionator3kWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
+				VersionatorWindowTemplate.dropdownBranches.SetValueWithoutNotify(Versionator.branches[Versionator.currentBranchOptionIdx]);
 				return;
 			}
 		
-			Versionator.currentBranchOptionIdx = Versionator3kWindowTemplate.dropdownBranches.index;
+			Versionator.currentBranchOptionIdx = VersionatorWindowTemplate.dropdownBranches.index;
 		}
 	
 	}

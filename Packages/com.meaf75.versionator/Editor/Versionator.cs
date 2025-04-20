@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
     /// <summary> Short Git track status </summary>
     public enum StatusType {
@@ -26,7 +26,7 @@ namespace Plugins.Versionator3k.Editor
     /// <summary> Contain each git tracked file resume </summary>
     public struct GitFileStatus {
         public bool isMergeError;
-        /// <summary> Is this file selected on the Versionator3k window list? </summary>
+        /// <summary> Is this file selected on the Versionator window list? </summary>
         public bool isSelected;
         /// <summary> Long name for the status of the file </summary>
         public string statusName;
@@ -46,7 +46,7 @@ namespace Plugins.Versionator3k.Editor
 
         private const string EMPTY_GUI = "00000000000000000000000000000000";
 
-        public const string PREF_KEY_COMMIT_MESSAGE = "versionator3k_commit_msg_backup";
+        public const string PREF_KEY_COMMIT_MESSAGE = "versionator_commit_msg_backup";
 
         /// <summary> More icons at: https://github.com/Zxynine/UnityEditorIcons </summary>
         private static readonly string[] StatusIcons = {
@@ -179,8 +179,8 @@ namespace Plugins.Versionator3k.Editor
         }
     
         /// <summary> Pull & parse all the data from basic git command like all branches or current branch </summary>
-        /// <param name="window">The Versionator3k window editor to get the plugin installation path </param>
-        public static void LoadData(Versionator3kWindow window) {
+        /// <param name="window">The Versionator window editor to get the plugin installation path </param>
+        public static void LoadData(VersionatorWindow window) {
             pluginPath = GetPluginPath(window);
         
             // Get use current branch
@@ -213,7 +213,7 @@ namespace Plugins.Versionator3k.Editor
             }
         }
 
-        /// <summary> Cache and parse a "git status" command to build the Versionator3k info to be used by the main window  </summary>
+        /// <summary> Cache and parse a "git status" command to build the Versionator info to be used by the main window  </summary>
         public static void RefreshFilesStatus() {
             // Get files with status
             var statusExec = ExecuteProcessTerminal2("status -u -s", "git");
@@ -280,7 +280,7 @@ namespace Plugins.Versionator3k.Editor
         }
 
         /// <summary> Hacky method to get the plugin installation path based on an Editor window </summary>
-        /// <param name="target">Any Versionator3k Editor window</param>
+        /// <param name="target">Any Versionator Editor window</param>
         /// <returns>Path of the plugin</returns>
         public static string GetPluginPath(EditorWindow target) {
             var script = MonoScript.FromScriptableObject(target);
@@ -662,7 +662,7 @@ namespace Plugins.Versionator3k.Editor
             try {
                 ExecuteProcessTerminal2("", "git");
             } catch(Exception e) {
-                Debug.LogError($"\"git\" was not detected on the system path, please install it before use Versionator3k, https://git-scm.com/download \n{e.Message}");
+                Debug.LogError($"\"git\" was not detected on the system path, please install it before use Versionator, https://git-scm.com/download \n{e.Message}");
                 return false;
             }
 

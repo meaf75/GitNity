@@ -10,3 +10,7 @@
 .text-added {
     color: rgba(56, 255, 49, 255);
 }
+
+.modified-line {
+    background-color: #87722C;
+}

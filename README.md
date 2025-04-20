@@ -1,21 +1,23 @@
-# Versionator3k - Git for Unity
+# Versionator - Git for Unity
 
-<img src="./.github/versionator3k-repo-card.png">
+<img src="./.github/repo-card.webp">
 
 <br>
 
-[![versionator3k-assetstore](.github/asset-store.webp)](https://u3d.as/3aVX)
+<a href="https://u3d.as/3aVX">
+    <img src="./.github/asset-store.webp" width="300">
+</a>
 
 <br>
 
 Git integration for Unity projects, all basic tools inside the editor
 
-Github Repository: https://github.com/meaf75/Versionator3k
+Github Repository: https://github.com/meaf75/Versionator
 
 ⚠ **Plugin under development**: I'm still working on this project :construction_worker: so be careful using it on larger projects and feel free to contribute it 🚧🚧
 
-![Versionator3k](./.github/plugin-screen.webp)
-![Versionator3k](./.github/modified-assets-icons.webp)
+![Versionator](./.github/plugin-screen.webp)
+![Versionator](./.github/modified-assets-icons.webp)
 
 <div class="page-break"></div>
 
@@ -42,9 +44,10 @@ Unchecked means To Do
 - [Installation](#installation)
     - [From git Url](#from-a-git-url)
     - [From this repo](#from-this-repo)
+    - [From unity store](#from-unity-asset-store-🤞)
 - [Instructions](#instructions)
     - [Configuration](#configuration)
-    - [Versionator3k window](#versionator3k-window)
+    - [Versionator window](#versionator-window)
         - [Branching](#branching)
         - [Commits tab](#commits-tab)
         - [Diff window](#diff-window)
@@ -52,39 +55,46 @@ Unchecked means To Do
 
 # Requirements
 - You must have the git command line tools registered in your system path, you can install it at https://git-scm.com/download.
-- Unity 2021.3.x
+- Unity 2021.3.x or higher
 
 <div class="page-break"></div>
 
 # Installation
-## From a git url
+## From a git url (recommended)
 You can install this plugin via assets manager from a git url
 
-![install-1](./.github/pm-versionator3k.webp)
-![install-2](./.github/pm-versionator3k-2.webp)
+![install-1](./.github/pm.webp)
 
 More information at: https://docs.unity3d.com/Manual/upm-ui-giturl.html
 
 ```
-https://github.com/meaf75/Versionator3k.git?path=/Assets/Plugins/Versionator3k
+https://github.com/meaf75/Versionator.git?path=/Packages/com.meaf75.versionator
 ```
 ## From this repo
-Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins/Versionator3k/) inside a folder in your unity project located at the same route
+Copy the content of this repository located at [Packages/com.meaf75.versionator](./Packages/com.meaf75.versionator) inside your `Packages` directory in your unity project.
+
+## From unity asset store 🤞
+
+<a href="https://u3d.as/3aVX">
+    <img src="./.github/asset-store.webp" width="300">
+</a>
+
+</br></br>
 
 <div class="page-break"></div>
 
 # Instructions
 
 ## Configuration
-- All windows are located under Tools/Versionator3k.
+- All windows are located under `Tools/Versionator`.
 
     ![path](./.github/w-location.webp)
 
-- Configuration window allows you setup repository information (Tools/Versionator3k/Versionator3k Config).
+- Configuration window allows you setup repository information (Tools/Versionator/Versionator Config).
 
     ![config-window](./.github/config-window.webp)
 
-- Make sure your project is a git repository if not then you can initialize your project from the config window (Tools/Versionator3k/Versionator3k Config).
+- Make sure your project is a git repository if not then you can initialize your project from the config window (Tools/Versionator/Versionator Config).
 
     ![config-window-warnings](./.github/w-config-warnings.webp)
 
@@ -92,19 +102,20 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
 
     ![config-window-warnings](./.github/ssh-key.webp)
 
-## Versionator3k window
-- First you will need to select the files you want to commit, you can do it by selecting the files in the Versionator3k window (Tools/Versionator3k/Versionator3k Window), add a commit message and add a commit message, finally you have to click the "Commit selected" button, this action will add selected items and commit them.
+## Versionator window
+- First you will need to select the files you want to commit, you can do it by selecting the files in the Versionator window (Tools/Versionator/Versionator Window), add a commit message and add a commit message, finally you have to click the "Commit selected" button, this action will add selected items and commit them.
 
-    ![versionator3k-window-select](./.github/select-files-to-commit.webp)
+    ![versionator-window-select](./.github/select-files-to-commit.webp)
 
 - After commit your files the final step is push your commit, when you have commits without push a "push" button will apear next to the "Commit selected" button, click it to push your pending commits, this action will make the selected files to disappear from the list don't worry they are staged with the new commit.
 
-    ![versionator3k-push](./.github/push.webp)
+    ![versionator-push](./.github/push.webp)
 
 <div class="page-break"></div>
 
 - Icons will be drawn over the project assets to represent their git status inside unity
     ![modified-assets](./.github/modified-assets-icons-preview.webp)
+
     | Status        | Icon |
     | -----------   | ----------- |
     | Deleted       | <img src="https://github.com/Zxynine/UnityEditorIcons/raw/main/icons/small/processed/d_CollabDeleted%20Icon.png" width="40"/> |
@@ -120,7 +131,7 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
     ![context-menu](./.github/context-menu.webp)
 
 ### Branching
-- branching, you can switch between git branches by clicking over the drop down at the top right corner of the Versionator3k window, all tracked branches will be displayed as value in the dropdown menu
+- branching, you can switch between git branches by clicking over the drop down at the top right corner of the Versionator window, all tracked branches will be displayed as value in the dropdown menu
     ![swith-branch](./.github/switch-branch.webp)
 
 - you can also create a new branch by selecting "New branch..." option in the branch dropdown.
@@ -130,8 +141,10 @@ Copy the content of this repository located at [Assets/Plugins](./Assets/Plugins
     
     ![new-branch-window](./.github/new-branch-window.webp)
 
+<div class="page-break"></div>
+
 ### Commits tab
-- You can list the commits made in a specific branch by selecting the "Commits" tab in the Versionator3k window
+- You can list the commits made in a specific branch by selecting the "Commits" tab in the Versionator window
 
     ![commit-window](./.github/commits-window.webp)
 

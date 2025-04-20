@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.Versionator3k.Editor
+namespace Versionator.Editor
 {
     public class CreateBranchWindow : EditorWindow {
     
@@ -72,8 +72,8 @@ namespace Plugins.Versionator3k.Editor
             if(!created)
                 return;
          
-            var versionator3kWindow = GetWindow<Versionator3kWindow>(typeof(Versionator3kWindow));
-            versionator3kWindow.DrawWindow(true);  // Update parent 
+            var versionatorWindow = GetWindow<VersionatorWindow>(typeof(VersionatorWindow));
+            versionatorWindow.DrawWindow(true);  // Update parent 
             
             EditorUtility.DisplayDialog("Success", $"Branch \"{BranchName}\" created, switched: {SwitchToBranch}", "Ok");
             Close();
