@@ -27,7 +27,7 @@ namespace Versionator.Editor
 			window = GetWindow<VersionatorWindow>(typeof(VersionatorWindow));
 
 			// Loads an icon from an image stored at the specified path
-			Texture icon = AssetDatabase.LoadAssetAtPath<Texture> ($"{Versionator.GetPluginPath(window)}/Icons/icons8-git-48.png");
+			Texture icon = AssetDatabase.LoadAssetAtPath<Texture> ($"{Versionator.GetPluginPath(window)}/Icons/git-48.png");
 			// Create the instance of GUIContent to assign to the window. Gives the title "RBSettings" and the icon
 			GUIContent titleContent = new GUIContent ("Versionator", icon);
 		
