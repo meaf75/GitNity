@@ -52,6 +52,7 @@ Unchecked means To Do
         - [Commits tab](#commits-tab)
         - [Diff window](#diff-window)
 - [Commands used](#git-commands-used)
+- [Development](#development)
 
 # Requirements
 - You must have the git command line tools registered in your system path, you can install it at https://git-scm.com/download.
@@ -158,3 +159,13 @@ Copy the content of this repository located at [Packages/com.meaf75.versionator]
 
 # Git commands used
 You can find a full list of all the git commands used on this project at [README_GIT_COMMANDS.md](./README_GIT_COMMANDS.md)
+
+# Development
+
+Install package from git branch url
+
+    https://github.com/meaf75/GitNity.git?path=/Packages/com.meaf75.versionator#<the_new_branch_name>
+
+example:
+
+    https://github.com/meaf75/GitNity.git?path=/Packages/com.meaf75.versionator#rename-for-unity-store

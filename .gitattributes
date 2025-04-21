@@ -25,6 +25,7 @@
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.ai filter=lfs diff=lfs merge=lfs -text
 *.kra filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text
 
 #Audio
 *.mp3 filter=lfs diff=lfs merge=lfs -text
@@ -54,4 +55,7 @@
 *.rns filter=lfs diff=lfs merge=lfs -text
 *.reason filter=lfs diff=lfs merge=lfs -text
 *.lxo filter=lfs diff=lfs merge=lfs -text
+
+# Exclude package assets
+Packages/com.meaf75.versionator/icons/*.png !filter !diff !merge text
 
