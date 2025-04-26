@@ -6,7 +6,7 @@
             <ui:VisualElement name="header-left" style="flex-direction: row-reverse;">
                 <ui:Label text="Master" display-tooltip-when-elided="true" name="label-branch" style="-unity-text-align: middle-left; width: 158px; margin-left: 5px;" />
                 <ui:Label text="Current branch:" display-tooltip-when-elided="true" style="-unity-text-align: middle-left; margin-left: 5px;" />
-                <ui:VisualElement name="icon-git" style="height: 20px; width: 20px; background-image: url(&apos;project://database/Packages/com.meaf75.versionator/Icons/git-16.png?fileID=2800000&amp;guid=c27e68843a4ecc34f85a1fbd09aa94bc&amp;type=3#git-16&apos;); min-width: 19px; min-height: 19px; background-color: rgb(255, 255, 255); border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px;" />
+                <ui:VisualElement name="icon-git" style="height: 20px; width: 20px; background-image: url(&apos;project://database/Packages/com.meaf75.versionator/Icons/git-16.png?fileID=21300000&amp;guid=c27e68843a4ecc34f85a1fbd09aa94bc&amp;type=3#git-16&apos;); min-width: 19px; min-height: 19px; background-color: rgb(255, 255, 255); border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px;" />
             </ui:VisualElement>
             <ui:VisualElement name="header-right" style="flex-direction: row;">
                 <ui:DropdownField index="0" choices="Masterux,Testux" name="dropdown-branches" />

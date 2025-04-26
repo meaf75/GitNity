@@ -53,6 +53,10 @@ namespace Versionator.Editor
         }
 
         private void OnLostFocus() {
+	        
+	        if (!Versionator.isGitRepository) 
+		        return;
+	        
 			string userCommit = TabGitChangesTemplate.GetCommitMessage(currentTabTemplate);
 
 			Debug.Log("User commit message saved ");

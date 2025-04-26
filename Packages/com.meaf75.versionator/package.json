@@ -1,7 +1,7 @@
 {
   "name": "com.meaf75.versionator",
   "displayName": "Versionator",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "unity": "2021.3",
   "description": "Git integration for Unity projects, all basic tools inside the editor\n\nGithub: https://github.com/meaf75/Versionator",
   "changelogUrl": "https://github.com/meaf75/Versionator/commits/master/",
