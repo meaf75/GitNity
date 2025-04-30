@@ -9,26 +9,26 @@ namespace Versionator.Editor {
 		{
 
 			if (didDomainReload) {
-				// Do nothing, files status will be refreshed from the GitNity constructor on domain reload
+				// Do nothing, files status will be refreshed from the Versionator constructor on domain reload
 				return;
 			}
 
 			foreach (string str in importedAssets) {
-				if (str.EndsWith(".cs"))    // If is a c# file then the GitNity constructor on domain reload will refresh the data
+				if (str.EndsWith(".cs"))    // If is a c# file then the Versionator constructor on domain reload will refresh the data
 					return;
 
 				Debug.Log("Reimported Asset: " + str);
 			}
 
 			foreach (string str in deletedAssets) {
-				if (str.EndsWith(".cs"))    // If is a c# file then the GitNity constructor on domain reload will refresh the data
+				if (str.EndsWith(".cs"))    // If is a c# file then the Versionator constructor on domain reload will refresh the data
 					return;
 
 				Debug.Log("Deleted Asset: " + str);
 			}
 
 			for (int i = 0; i < movedAssets.Length; i++) {
-				if (movedAssets[i].EndsWith(".cs")) // If is a c# file then the GitNity constructor on domain reload will refresh the data
+				if (movedAssets[i].EndsWith(".cs")) // If is a c# file then the Versionator constructor on domain reload will refresh the data
 					return;
 
 				string guid = AssetDatabase.AssetPathToGUID(movedAssets[i]);

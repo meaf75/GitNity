@@ -44,7 +44,7 @@ namespace Versionator.Editor
 			GUIContent content = new GUIContent("Reload");
 			menu.AddItem(content, false, () => DrawWindow(true));
 
-            GUIContent content2 = new GUIContent("Open Gitnity config window");
+            GUIContent content2 = new GUIContent("Open Versionator config window");
             menu.AddItem(content2, false, OpenToolsWindow);
         }
 

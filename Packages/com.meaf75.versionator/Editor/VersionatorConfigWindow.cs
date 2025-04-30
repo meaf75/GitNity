@@ -59,8 +59,8 @@ namespace Versionator.Editor
             GUIContent content = new GUIContent("Repaint");
             menu.AddItem(content, false, OnFocus);
 
-            GUIContent content2 = new GUIContent("Open Gitnity window");
-            menu.AddItem(content2, false, OpenGitnityWindow);
+            GUIContent content2 = new GUIContent("Open Versionator window");
+            menu.AddItem(content2, false, OpenVersionatorWindow);
         }
 
         /// <summary> Reload config data on gain focus </summary>
@@ -69,7 +69,7 @@ namespace Versionator.Editor
             Repaint();
         }
 
-        private void OpenGitnityWindow() {
+        private void OpenVersionatorWindow() {
             VersionatorWindow.Init();
         }
 
@@ -255,7 +255,7 @@ namespace Versionator.Editor
             var reader = new StreamReader(webStream);
             string data = reader.ReadToEnd();
 
-            data += "\n##### GITNITY CUSTOM #####" +
+            data += "\n##### VERSIONATOR CUSTOM #####" +
                     "\n.idea";
         
         

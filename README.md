@@ -1,4 +1,4 @@
-# Versionator - Git for Unity
+# Versionator – Git-Friendly Version Control for Unity
 
 <img src="./.github/repo-card.webp">
 
@@ -164,8 +164,12 @@ You can find a full list of all the git commands used on this project at [README
 
 Install package from git branch url
 
-    https://github.com/meaf75/GitNity.git?path=/Packages/com.meaf75.versionator#<the_new_branch_name>
+    https://github.com/meaf75/Versionator.git?path=/Packages/com.meaf75.versionator#<the_new_branch_name>
 
 example:
 
-    https://github.com/meaf75/GitNity.git?path=/Packages/com.meaf75.versionator#rename-for-unity-store
+    https://github.com/meaf75/Versionator.git?path=/Packages/com.meaf75.versionator#rename-for-unity-store
+
+## Export unity package
+
+In the toolbar go to `Tools/Export Versionator Package`

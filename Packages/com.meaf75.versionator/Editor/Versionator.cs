@@ -248,7 +248,7 @@ namespace Versionator.Editor
 
         public static async void ProcessIgnoredFiles(){
             if (!File.Exists(RootGitIgnoreFilePath)){
-                Debug.LogWarning($"Gitignore file not found at: {RootGitIgnoreFilePath},  you can create it using the Gitnity config window");
+                Debug.LogWarning($"Gitignore file not found at: {RootGitIgnoreFilePath},  you can create it using the Versionator config window");
                 return;
             }
 
