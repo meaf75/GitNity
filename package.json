@@ -1,9 +1,9 @@
 {
-  "name": "com.meaf75.gitnity",
-  "displayName": "gitnity",
+  "name": "versionator",
+  "displayName": "versionator",
   "version": "0.1.0",
   "unity": "2021.3",
-  "description": "[Do not upgrade the version from here] Git integration for Unity projects, all basic tools inside the editor",
+  "description": "[Do not upgrade the version from here] install from package.json at ./packages/com.meaf75.versionator Git integration for Unity projects, all basic tools inside the editor",
   "keywords": [
     "unity",
     "git",
@@ -12,7 +12,8 @@
     "editor"
   ],
   "scripts": {
-    "generate_gitnity_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Assets/Plugins/GitNity/README.pdf"
+    "generate_versionator_pdf": "md-to-pdf ./README.md && move ./README.pdf ./Packages/com.meaf75.versionator/README.pdf",
+    "all_png_to_webp": "node ./scripts/convert-github-imgs-to-webp.mjs"
   },
   "category": "tool",
   "devDependencies": {

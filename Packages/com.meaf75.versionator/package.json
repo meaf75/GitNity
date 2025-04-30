@@ -1,0 +1,18 @@
+{
+  "name": "com.meaf75.versionator",
+  "displayName": "Versionator",
+  "version": "0.1.9",
+  "unity": "2021.3",
+  "description": "Git integration for Unity projects, all basic tools inside the editor\n\nGithub: https://github.com/meaf75/Versionator",
+  "changelogUrl": "https://github.com/meaf75/Versionator/commits/master/",
+  "documentationUrl": "https://github.com/meaf75/Versionator",
+  "licensesUrl": "https://github.com/meaf75/Versionator/blob/master/LICENSE",
+  "keywords": [
+    "unity",
+    "git",
+    "tool",
+    "custom",
+    "editor"
+  ],
+  "category": "tool"
+}

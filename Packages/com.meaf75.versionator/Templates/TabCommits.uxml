@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.meaf75.versionator/Templates/USS/CommitElement.uss?fileID=7433441132597879392&amp;guid=684639ae8d6b3aa47bbe388b83794b32&amp;type=3#CommitElement" />
+    <ui:VisualElement>
+        <ui:VisualElement style="flex-direction: row; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; min-height: 45px;">
+            <ui:Label text="Show commits from:" display-tooltip-when-elided="true" />
+            <ui:DropdownField index="0" choices="Masterux,Testux" name="dropdown-branches" style="flex-grow: 0; width: 219px;" />
+        </ui:VisualElement>
+        <ui:VisualElement class="container" style="min-height: 20px;">
+            <ui:Label text="Owner" display-tooltip-when-elided="true" name="owner" class="label-owner" style="-unity-text-align: upper-center; border-bottom-color: rgb(115, 115, 115); border-bottom-width: 1px;" />
+            <ui:Label text="Description" display-tooltip-when-elided="true" name="description" class="label-description" style="border-bottom-color: rgb(115, 115, 115); border-bottom-width: 1px;" />
+            <ui:Label text="Date" display-tooltip-when-elided="true" name="date" class="label-date" style="border-bottom-color: rgb(115, 115, 115); border-bottom-width: 1px; max-width: 134px;" />
+            <ui:Label text="Commit" display-tooltip-when-elided="true" name="commitHash" class="label-commit-hash" style="border-bottom-width: 1px; border-bottom-color: rgb(115, 115, 115); min-width: 72px;" />
+        </ui:VisualElement>
+        <ui:ListView focusable="true" name="list-view-commits" show-alternating-row-backgrounds="ContentOnly" />
+    </ui:VisualElement>
+</ui:UXML>

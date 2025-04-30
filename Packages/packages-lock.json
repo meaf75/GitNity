@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.meaf75.versionator": {
+      "version": "file:com.meaf75.versionator",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.asset-store-tools": {
       "version": "file:com.unity.asset-store-tools",
       "depth": 0,
