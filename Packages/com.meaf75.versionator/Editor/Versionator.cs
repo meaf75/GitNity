@@ -292,7 +292,7 @@ namespace Versionator.Editor
         private static GitFileStatus GetFileStatus(string fileStatusWithPath) {
         
             GitFileStatus trackStatus;
-            trackStatus.path = fileStatusWithPath[3..];
+            trackStatus.path = DecodeGitEscapedPath(fileStatusWithPath[3..]);
             trackStatus.isSelected = false;
         
             if(trackStatus.path.Contains("henlo"))
@@ -303,7 +303,7 @@ namespace Versionator.Editor
             if (trackStatus.path.Contains("\""))    // Clear spaced paths 
                 trackStatus.path = trackStatus.path.Replace("\"","");
         
-	    if (trackStatus.path.Contains(" -> ")) {    // Handle renamed files
+	        if (trackStatus.path.Contains(" -> ")) {    // Handle renamed files
                 trackStatus.path = trackStatus.path.Split(" -> ")[1];
             }
 	
@@ -667,6 +667,18 @@ namespace Versionator.Editor
             }
 
             return true;
+        }
+        
+        public static string DecodeGitEscapedPath(string input) {
+            return Regex.Replace(input, @"(?:\\\d{3})+", match =>
+            {
+                string[] octalValues = Regex.Matches(match.Value, @"\\(\d{3})")
+                    .Select(m => m.Groups[1].Value)
+                    .ToArray();
+
+                byte[] bytes = Array.ConvertAll(octalValues, val => Convert.ToByte(val, 8));
+                return Encoding.UTF8.GetString(bytes);
+            });
         }
     }
 
